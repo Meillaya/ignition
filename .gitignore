@@ -81,3 +81,7 @@ test-results/
 
 # Drizzle ORM migration files
 migrations/
+.aider*
+sk-29f71dc1746f4eb88955131cc87d6233
+
+.venv

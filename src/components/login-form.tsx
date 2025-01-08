@@ -51,7 +51,7 @@ export function LoginForm() {
   async function onSubmit(values: { email: string; password: string }) {
     setIsLoading(true)
     try {
-      const {error} = await supabase.auth.signInWithPassword({
+      const { error } = await supabase.auth.signInWithPassword({
         email: values.email,
         password: values.password,
       });
@@ -69,50 +69,47 @@ export function LoginForm() {
     }
   }
 
-// login-form.tsx
-async function signInWithGoogle() {
-  setIsLoading(true);
-  try {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-    });
+  async function signInWithGoogle() {
+    setIsLoading(true);
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+      });
 
-    if (error) throw error;
+      if (error) throw error;
 
-    // Handle successful login (e.g., redirect or set user state)
-    setShowRoleDialog(true);
-  } catch (error) {
-    toast({
-      variant: "destructive",
-      title: "Google login failed",
-      description: "Please try again.",
-    });
-  } finally {
-    setIsLoading(false);
+      setShowRoleDialog(true);
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Google login failed",
+        description: "Please try again.",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   }
-}
 
-async function signInWithApple() {
-  setIsLoading(true);
-  try {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'apple',
-    });
+  async function signInWithApple() {
+    setIsLoading(true);
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'apple',
+      });
 
-    if (error) throw error;
+      if (error) throw error;
 
-    // Handle successful login (e.g., redirect or set user state)
-    setShowRoleDialog(true);
-  } catch (error) {
-    toast({
-      variant: "destructive",
-      title: "Apple login failed",
-      description: "Please try again.",
-    });
-  } finally {
-    setIsLoading(false);
+      setShowRoleDialog(true);
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Apple login failed",
+        description: "Please try again.",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   }
-}
 
   const handleRoleSelection = (role: 'client' | 'contractor') => {
     setSelectedRole(role)
@@ -203,4 +200,3 @@ async function signInWithApple() {
     </>
   )
 }
-
