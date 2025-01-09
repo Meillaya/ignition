@@ -21,9 +21,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from './ui/select'
-import { useAuth } from './auth-provider'
 import { useToast } from './ui/use-toast'
 import { supabase } from '@/lib/supabaseClient';
+import { usersTable } from '@/db/schema';
+import { eq } from 'drizzle-orm';
+import bcrypt from 'bcryptjs'; // For hashing passwords
+import { drizzle } from 'drizzle-orm/node-postgres'
+import {client} from "pg";
+
+const db = drizzle(client);
 
 const formSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
@@ -32,7 +38,7 @@ const formSchema = z.object({
 })
 
 export function SignupForm() {
-  const { signup } = useAuth()
+  // const { signup } = useAuth()
   const { toast } = useToast()
   const [isLoading, setIsLoading] = useState(false)
 
@@ -46,26 +52,39 @@ export function SignupForm() {
   })
 
 
-  async function onSignUp (values: { email: string; password: string }) {
-    setIsLoading(true)
+  async function onSignUp(values: z.infer<typeof formSchema>) {
+    setIsLoading(true);
     try {
-      const {error} = await supabase.auth.signUp({
-        email: values.email,
-        password: values.password,
-      });
-      if (error) throw error;
+      // Hash the password before storing it in the database
+      const hashedPassword = await bcrypt.hash(values.password, 10);
+  
+      // Insert the user into the database
+      const newUser = await db
+        .insert(usersTable)
+        .values({
+          email: values.email,
+          password: hashedPassword,
+          role: values.role,
+        })
+        .returning(); // Return the newly created user
+  
+      // Show success toast
       toast({
-        title: "Check your email",
-        description: "We sent you an email with a link to confirm your email address.",
-      })
+        title: "Account created successfully",
+        description: "You can now log in with your credentials.",
+      });
+  
+      // Optionally, you can redirect the user to the login page
+      // router.push('/login');
     } catch (error) {
+      console.error("Error creating user:", error);
       toast({
         variant: "destructive",
         title: "Sign up failed",
-        description: "Please check your credentials and try again.",
-      })
+        description: "An error occurred while creating your account. Please try again.",
+      });
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
   }
 

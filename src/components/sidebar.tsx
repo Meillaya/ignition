@@ -13,8 +13,8 @@ import { useState } from 'react'
 const getRoutes = (role: 'client' | 'contractor') => {
   const commonRoutes = [
     { name: 'Dashboard', href: `/dashboard/${role}`, icon: Home },
-    { name: 'Messages', href: `/dashboard/${role}/messages`, icon: MessageSquare },
-    { name: 'Settings', href: `/dashboard/${role}/settings`, icon: Settings },
+    { name: 'Messages', href: `/dashboard/messages`, icon: MessageSquare },
+    { name: 'Settings', href: `/dashboard/settings`, icon: Settings },
   ]
 
   const clientRoutes = [

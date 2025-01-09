@@ -1,11 +1,13 @@
 import 'dotenv/config';
-import { drizzle } from 'drizzle-orm/postgres-js';
 import { eq } from 'drizzle-orm';
-import { usersTable } from '@/db/schema';
-  
-const db = drizzle(process.env.DATABASE_URL!);
+import { drizzle } from 'drizzle-orm/xata-http';
+import { getXataClient } from './xata';
+import { usersTable } from './db/schema';
 
 async function main() {
+  const xata = getXataClient();
+  const db = drizzle(xata);
+
   const user: typeof usersTable.$inferInsert = {
     name: 'John',
     age: 30,

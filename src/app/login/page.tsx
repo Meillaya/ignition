@@ -19,7 +19,7 @@ export default function LoginPage() {
         <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-secondary/10 backdrop-blur-3xl" />
         <div className="relative h-full flex flex-col justify-between p-12 text-white">
           <div>
-            <Link href="/" className="text-2xl font-bold">EcoWaste</Link>
+            <Link href="/" className="text-2xl font-bold">Fox in the Truck</Link>
           </div>
           <div className="space-y-6">
             <h1 className="text-4xl font-extrabold">Welcome Back</h1>
