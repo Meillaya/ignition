@@ -1,133 +1,50 @@
-"use client"
+import { Metadata } from 'next'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
 
-import { useState } from 'react'
-import { format } from 'date-fns'
-import { CalendarIcon, Truck, Package } from 'lucide-react'
-import { cn } from "@/src/lib/utils"
-import { Button } from "@/src/components/ui/button"
-import { Calendar } from "@/src/components/ui/calendar"
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/src/components/ui/popover"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/src/components/ui/table"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/src/components/ui/select"
-
-// Mock data for orders
-const orders = [
-  { id: 1, date: '2023-05-01', type: 'Construction', size: 'Medium', status: 'Completed' },
-  { id: 2, date: '2023-06-15', type: 'Demolition', size: 'Large', status: 'In Progress' },
-  { id: 3, date: '2023-07-20', type: 'Renovation', size: 'Small', status: 'Scheduled' },
-  { id: 4, date: '2023-08-05', type: 'Construction', size: 'Medium', status: 'Completed' },
-  { id: 5, date: '2023-09-10', type: 'Demolition', size: 'Large', status: 'In Progress' },
-]
+export const metadata: Metadata = {
+  title: 'Order History - EcoWaste',
+  description: 'View your past waste disposal orders',
+}
 
 export default function OrderHistoryPage() {
-  const [date, setDate] = useState<Date>()
-  const [status, setStatus] = useState<string>()
-
-  const filteredOrders = orders.filter(order => {
-    if (date && new Date(order.date).toDateString() !== date.toDateString()) {
-      return false
-    }
-    if (status && order.status !== status) {
-      return false
-    }
-    return true
-  })
+  // Mock data - replace with actual data fetching
+  const orders = [
+    { id: 1, date: '2023-05-01', status: 'Completed', type: 'Mixed Waste' },
+    { id: 2, date: '2023-06-15', status: 'In Progress', type: 'Construction Debris' },
+    { id: 3, date: '2023-07-20', status: 'Scheduled', type: 'Recyclables' },
+  ]
 
   return (
     <div className="space-y-6">
       <h1 className="text-3xl font-bold">Order History</h1>
-      
-      <div className="flex flex-col sm:flex-row gap-4">
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button
-              variant={"outline"}
-              className={cn(
-                "w-full sm:w-[280px] justify-start text-left font-normal",
-                !date && "text-muted-foreground"
-              )}
-            >
-              <CalendarIcon className="mr-2 h-4 w-4" />
-              {date ? format(date, "PPP") : <span>Pick a date</span>}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-auto p-0">
-            <Calendar
-              mode="single"
-              selected={date}
-              onSelect={setDate}
-              initialFocus
-            />
-          </PopoverContent>
-        </Popover>
-
-        <Select onValueChange={setStatus}>
-          <SelectTrigger className="w-full sm:w-[280px]">
-            <SelectValue placeholder="Filter by status" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="Completed">Completed</SelectItem>
-            <SelectItem value="In Progress">In Progress</SelectItem>
-            <SelectItem value="Scheduled">Scheduled</SelectItem>
-          </SelectContent>
-        </Select>
-
-        <Button
-          variant="ghost"
-          onClick={() => {
-            setDate(undefined)
-            setStatus(undefined)
-          }}
-        >
-          Reset Filters
-        </Button>
-      </div>
-
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Order ID</TableHead>
-            <TableHead>Date</TableHead>
-            <TableHead>Type</TableHead>
-            <TableHead>Size</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {filteredOrders.map((order) => (
-            <TableRow key={order.id}>
-              <TableCell>{order.id}</TableCell>
-              <TableCell>{format(new Date(order.date), 'PP')}</TableCell>
-              <TableCell>{order.type}</TableCell>
-              <TableCell>{order.size}</TableCell>
-              <TableCell>{order.status}</TableCell>
-              <TableCell>
-                <Button variant="ghost" size="sm">
-                  View Details
-                </Button>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+      <Card>
+        <CardHeader>
+          <CardTitle>Your Past Orders</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ul className="space-y-4">
+            {orders.map((order) => (
+              <li key={order.id} className="flex items-center justify-between border-b pb-4 last:border-b-0 last:pb-0">
+                <div>
+                  <p className="font-semibold">Order #{order.id}</p>
+                  <p className="text-sm text-muted-foreground">{order.date} - {order.type}</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className={`px-2 py-1 rounded-full text-xs ${
+                    order.status === 'Completed' ? 'bg-green-100 text-green-800' :
+                    order.status === 'In Progress' ? 'bg-blue-100 text-blue-800' :
+                    'bg-yellow-100 text-yellow-800'
+                  }`}>
+                    {order.status}
+                  </span>
+                  <Button variant="outline" size="sm">View Details</Button>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </CardContent>
+      </Card>
     </div>
   )
 }

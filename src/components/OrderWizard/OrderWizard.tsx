@@ -2,15 +2,14 @@
 
 import React, { createContext, useContext, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { OrderDetails, WizardContextType } from '../../types/wizard'
-import { Button } from '../ui/button'
-import { Progress } from '../ui/progress'
+import { OrderDetails, WizardContextType } from '@/types/wizard'
+import { Button } from '@/components/ui/button'
+import { Progress } from '@/components/ui/progress'
 import WasteTypeStep from './steps/WasteTypeStep'
 import BinSizeStep from './steps/BinSizeStep'
 import BinPlacementStep from './steps/BinPlacementStep'
 import ContactInfoStep from './steps/ContactInfoStep'
 import PaymentStep from './steps/PaymentStep'
-
 
 const WizardContext = createContext<WizardContextType | undefined>(undefined)
 

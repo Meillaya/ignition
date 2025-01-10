@@ -1,8 +1,8 @@
 import React from 'react'
 import { motion } from 'framer-motion'
-import { Card, CardContent } from '@/src/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import { useWizard } from '../OrderWizard'
-import { BinPlacement } from '@/src/types/wizard'
+import { BinPlacement } from '@/types/wizard'
 
 const placementOptions: { value: BinPlacement; label: string; description: string; fee: number }[] = [
   {

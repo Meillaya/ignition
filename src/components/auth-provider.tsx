@@ -11,7 +11,7 @@ type User = {
 
 type AuthContextType = {
   user: User | null
-  login: (email: string, password: string) => Promise<void>
+  login: (email: string, password: string) => Promise<User>
   logout: () => void
   signup: (email: string, password: string, role: 'client' | 'contractor') => Promise<void>
 }
@@ -36,7 +36,6 @@ export function AuthProvider({
   const router = useRouter()
 
   useEffect(() => {
-    // Check for existing session
     const checkAuth = async () => {
       try {
         const storedUser = localStorage.getItem('user')
@@ -53,14 +52,14 @@ export function AuthProvider({
     checkAuth()
   }, [])
 
-  const login = async (email: string, password: string) => {
+  const login = async (email: string, password: string): Promise<User> => {
     try {
       // Simulate API call - replace with actual authentication
       await new Promise(resolve => setTimeout(resolve, 1000))
-      const mockUser = { id: '1', email, role: 'client' as const }
+      const mockUser = { id: '1', email, role: Math.random() > 0.5 ? 'client' : 'contractor' as const }
       setUser(mockUser)
       localStorage.setItem('user', JSON.stringify(mockUser))
-      router.push('/dashboard')
+      return mockUser
     } catch (error) {
       console.error('Login error:', error)
       throw error
@@ -84,7 +83,6 @@ export function AuthProvider({
       const mockUser = { id: '2', email, role }
       setUser(mockUser)
       localStorage.setItem('user', JSON.stringify(mockUser))
-      router.push('/dashboard')
     } catch (error) {
       console.error('Signup error:', error)
       throw error

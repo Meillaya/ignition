@@ -1,6 +1,6 @@
 import React from 'react'
 import { useWizard } from '../OrderWizard'
-import { Card, CardContent } from '@/src/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 
 const PaymentStep: React.FC = () => {
   const { orderDetails } = useWizard()

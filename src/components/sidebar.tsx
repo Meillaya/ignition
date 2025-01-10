@@ -1,35 +1,30 @@
 "use client"
 
+
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { Home, Package, Truck, FileText, Settings, LogOut, DollarSign, Calendar, MessageSquare, ClipboardList, CreditCard } from 'lucide-react'
+import { Home, Package, Truck, FileText, Settings, LogOut, DollarSign } from 'lucide-react'
 import { useAuth } from '@/components/auth-provider'
-import { Input } from '@/components/ui/input'
-import { useState } from 'react'
+import Image from 'next/image';
 
 const getRoutes = (role: 'client' | 'contractor') => {
   const commonRoutes = [
     { name: 'Dashboard', href: `/dashboard/${role}`, icon: Home },
-    { name: 'Messages', href: `/dashboard/messages`, icon: MessageSquare },
-    { name: 'Settings', href: `/dashboard/settings`, icon: Settings },
+    { name: 'Settings', href: '/dashboard/settings', icon: Settings },
   ]
 
   const clientRoutes = [
     { name: 'New Order', href: '/dashboard/client/new-order', icon: Package },
-    { name: 'Projects', href: '/dashboard/client/projects', icon: ClipboardList },
-    { name: 'Proposals', href: '/dashboard/client/proposals', icon: FileText },
     { name: 'Order History', href: '/dashboard/client/order-history', icon: FileText },
-    { name: 'Payments', href: '/dashboard/client/payments', icon: CreditCard },
   ]
 
   const contractorRoutes = [
-    { name: 'Jobs', href: '/dashboard/contractor/jobs', icon: Truck },
-    { name: 'Schedule', href: '/dashboard/contractor/schedule', icon: Calendar },
-    { name: 'Earnings', href: '/dashboard/contractor/earnings', icon: DollarSign },
+    { name: 'Available Jobs', href: '/dashboard/contractor/available-jobs', icon: Truck },
     { name: 'Job History', href: '/dashboard/contractor/job-history', icon: FileText },
+    { name: 'Earnings', href: '/dashboard/contractor/earnings', icon: DollarSign },
   ]
 
   return role === 'client' 
@@ -42,29 +37,22 @@ export function Sidebar() {
   const { user } = useAuth()
 
   const routes = getRoutes(user?.role || 'client')
-  const [searchQuery, setSearchQuery] = useState('')
-
-  const filteredRoutes = routes.filter(route =>
-    route.name.toLowerCase().includes(searchQuery.toLowerCase())
-  )
 
   return (
     <div className="flex h-full w-64 flex-col border-r bg-background">
       <div className="flex h-14 items-center border-b px-4">
-        <span className="text-lg font-semibold">EcoWaste</span>
-      </div>
-      <div className="px-3 py-2">
-        <Input
-          type="search"
-          placeholder="Search..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="h-9"
+      <Image
+          src="/foxinthetruck.jpg"
+          alt="Fox In The Truck"
+          width={35}
+          height={20}
+          className="rounded-full shadow-lg"
         />
+        <span className="text-lg font-semibold">Fox In The Truck</span>
       </div>
       <ScrollArea className="flex-1">
         <nav className="flex flex-col gap-1 p-2">
-          {filteredRoutes.map((route) => (
+          {routes.map((route) => (
             <Link
               key={route.href}
               href={route.href}

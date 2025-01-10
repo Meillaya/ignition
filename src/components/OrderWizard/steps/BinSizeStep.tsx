@@ -1,8 +1,8 @@
 import React from 'react'
 import { motion } from 'framer-motion'
-import { Card, CardContent } from '@/src/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import { useWizard } from '../OrderWizard'
-import { BinSize } from '@/src/types/wizard'
+import { BinSize } from '@/types/wizard'
 
 const binSizes: { size: BinSize; label: string; capacity: string; price: number }[] = [
   { size: '6', label: '6 Cubic Yards', capacity: 'Ideal for small projects', price: 200 },

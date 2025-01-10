@@ -1,52 +1,52 @@
 import React from 'react'
 import Image from 'next/image'
 import { motion } from 'framer-motion'
-import { Card, CardContent } from '@/src/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import { useWizard } from '../OrderWizard'
-import { WasteType } from '@/src/types/wizard'
+import { WasteType } from '@/types/wizard'
 
 const wasteTypes: { type: WasteType; label: string; description: string; image: string }[] = [
   {
     type: 'mixed_garbage',
     label: 'Mixed Garbage',
     description: 'General waste from construction or renovation projects.',
-    image: '/images/mixed-garbage.jpg',
+    image: '/mixed.jpg',
   },
   {
     type: 'asphalt',
     label: 'Asphalt',
     description: 'Broken up asphalt from driveways or roads.',
-    image: '/images/asphalt.jpg',
+    image: '/asphalt.jpg',
   },
   {
     type: 'dirt',
     label: 'Dirt',
     description: 'Clean fill dirt from excavation projects.',
-    image: '/images/dirt.jpg',
+    image: '/dirt.jpg',
   },
   {
     type: 'mixed_dirt',
     label: 'Mixed Dirt',
     description: 'Dirt mixed with small amounts of other materials.',
-    image: '/images/mixed-dirt.jpg',
+    image: '/mix-dirt.jpg',
   },
   {
     type: 'brick_and_block',
     label: 'Brick and Block',
     description: 'Broken bricks and concrete blocks.',
-    image: '/images/brick-and-block.jpg',
+    image: '/bricks-and-blocks.jpg',
   },
   {
     type: 'concrete',
     label: 'Concrete',
     description: 'Broken concrete from demolition projects.',
-    image: '/images/concrete.jpg',
+    image: '/concrete.jpg',
   },
   {
     type: 'brick_block_concrete',
     label: 'Brick, Block and Concrete',
     description: 'Mixed masonry waste.',
-    image: '/images/brick-block-concrete.jpg',
+    image: '/bricks-blocks-concrete.png',
   },
 ]
 

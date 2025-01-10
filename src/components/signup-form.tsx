@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
-import { Button } from './ui/button'
+import { Button } from '@/components/ui/button'
 import {
   Form,
   FormControl,
@@ -12,24 +12,20 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from './ui/form'
-import { Input } from './ui/input'
+} from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from './ui/select'
-import { useToast } from './ui/use-toast'
-import { supabase } from '@/lib/supabaseClient';
-import { usersTable } from '@/db/schema';
-import { eq } from 'drizzle-orm';
+} from '@/components/ui/select'
+import { useAuth } from '@/components/auth-provider'
+import { useToast } from '@/components/ui/use-toast'
+import { usersTable } from '@/db/schema'; // Import your users table schema
+import { eq } from 'drizzle-orm'; // Import Drizzle ORM utilities
 import bcrypt from 'bcryptjs'; // For hashing passwords
-import { drizzle } from 'drizzle-orm/node-postgres'
-import {client} from "pg";
-
-const db = drizzle(client);
 
 const formSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
@@ -38,7 +34,7 @@ const formSchema = z.object({
 })
 
 export function SignupForm() {
-  // const { signup } = useAuth()
+  const { signup } = useAuth()
   const { toast } = useToast()
   const [isLoading, setIsLoading] = useState(false)
 
@@ -51,46 +47,28 @@ export function SignupForm() {
     },
   })
 
-
-  async function onSignUp(values: z.infer<typeof formSchema>) {
-    setIsLoading(true);
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    setIsLoading(true)
     try {
-      // Hash the password before storing it in the database
-      const hashedPassword = await bcrypt.hash(values.password, 10);
-  
-      // Insert the user into the database
-      const newUser = await db
-        .insert(usersTable)
-        .values({
-          email: values.email,
-          password: hashedPassword,
-          role: values.role,
-        })
-        .returning(); // Return the newly created user
-  
-      // Show success toast
+      await signup(values.email, values.password, values.role)
       toast({
         title: "Account created successfully",
-        description: "You can now log in with your credentials.",
-      });
-  
-      // Optionally, you can redirect the user to the login page
-      // router.push('/login');
+        description: "Welcome to Fox In The Truck Management!",
+      })
     } catch (error) {
-      console.error("Error creating user:", error);
       toast({
         variant: "destructive",
-        title: "Sign up failed",
-        description: "An error occurred while creating your account. Please try again.",
-      });
+        title: "Signup failed",
+        description: "There was an error creating your account. Please try again.",
+      })
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
   }
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSignUp)} className="space-y-4">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         <FormField
           control={form.control}
           name="email"

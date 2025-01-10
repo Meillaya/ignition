@@ -1,104 +1,107 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/src/components/ui/card'
-import { Button } from '@/src/components/ui/button'
-import { 
-  Plus, FileText, CreditCard, MessageSquare, 
-  Clock, Calendar, DollarSign, CheckCircle 
-} from 'lucide-react'
+import { Metadata } from 'next'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { ArrowRight, Package, FileText, Truck, DollarSign } from 'lucide-react'
+import Link from 'next/link'
+
+export const metadata: Metadata = {
+  title: 'Client Dashboard - Fox In The Truck',
+  description: 'Manage your waste disposal projects',
+}
 
 export default function ClientDashboard() {
   return (
-    <div className="space-y-6">
-      <h1 className="text-3xl font-bold">Client Dashboard</h1>
+    <div className="container mx-auto p-6 space-y-8">
+      <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Client Dashboard</h1>
       
-      {/* Quick Actions */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Button className="flex items-center gap-2">
-          <Plus className="h-4 w-4" /> New Project
-        </Button>
-        <Button variant="outline" className="flex items-center gap-2">
-          <FileText className="h-4 w-4" /> Review Proposals
-        </Button>
-        <Button variant="outline" className="flex items-center gap-2">
-          <CreditCard className="h-4 w-4" /> Manage Payments
-        </Button>
-        <Button variant="outline" className="flex items-center gap-2">
-          <MessageSquare className="h-4 w-4" /> Message Contractors
-        </Button>
-      </div>
-
-      {/* Main Dashboard Content */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
+        <Card className="bg-white dark:bg-gray-800 transition-colors duration-200">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Active Projects</CardTitle>
-            <Clock className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-300">Total Orders</CardTitle>
+            <Package className="h-4 w-4 text-orange-500 dark:text-orange-400" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">4</div>
-            <p className="text-xs text-muted-foreground">2 pending completion</p>
+            <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">18</div>
+            <p className="text-xs text-gray-600 dark:text-gray-400">+2 from last month</p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="bg-white dark:bg-gray-800 transition-colors duration-200">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Pending Proposals</CardTitle>
-            <FileText className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-300">Active Projects</CardTitle>
+            <Truck className="h-4 w-4 text-orange-500 dark:text-orange-400" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">7</div>
-            <p className="text-xs text-muted-foreground">3 new this week</p>
+            <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">3</div>
+            <p className="text-xs text-gray-600 dark:text-gray-400">2 pending pickup</p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="bg-white dark:bg-gray-800 transition-colors duration-200">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Spent</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-300">Total Spent</CardTitle>
+            <DollarSign className="h-4 w-4 text-orange-500 dark:text-orange-400" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">$12,450</div>
-            <p className="text-xs text-muted-foreground">+2.5% from last month</p>
+            <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">$2,345</div>
+            <p className="text-xs text-gray-600 dark:text-gray-400">+15% from last month</p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="bg-white dark:bg-gray-800 transition-colors duration-200">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Project Completion</CardTitle>
-            <CheckCircle className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-300">Recycling Rate</CardTitle>
+            <FileText className="h-4 w-4 text-orange-500 dark:text-orange-400" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">89%</div>
-            <p className="text-xs text-muted-foreground">12 projects completed</p>
+            <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">78%</div>
+            <p className="text-xs text-gray-600 dark:text-gray-400">+2% from last month</p>
           </CardContent>
         </Card>
       </div>
 
-      {/* Project Timeline */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Project Timeline</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {[
-              { date: '2024-03-15', title: 'Site Cleanup Project', status: 'In Progress' },
-              { date: '2024-03-20', title: 'Waste Removal', status: 'Scheduled' },
-              { date: '2024-03-25', title: 'Recycling Program', status: 'Pending' },
-            ].map((project, index) => (
-              <div key={index} className="flex items-center justify-between border-b pb-4">
-                <div>
-                  <p className="font-medium">{project.title}</p>
-                  <p className="text-sm text-muted-foreground">{project.date}</p>
-                </div>
-                <span className={`px-2 py-1 rounded-full text-xs ${
-                  project.status === 'In Progress' ? 'bg-blue-100 text-blue-800' :
-                  project.status === 'Scheduled' ? 'bg-green-100 text-green-800' :
-                  'bg-yellow-100 text-yellow-800'
-                }`}>
-                  {project.status}
-                </span>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+      <div className="grid gap-6 md:grid-cols-2">
+        <Card className="bg-white dark:bg-gray-800 transition-colors duration-200">
+          <CardHeader>
+            <CardTitle className="text-gray-900 dark:text-gray-100">Recent Orders</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ul className="space-y-2">
+              {[1, 2, 3].map((order) => (
+                <li key={order} className="flex items-center justify-between">
+                  <span className="text-gray-600 dark:text-gray-300">Order #{order}</span>
+                  <Button variant="ghost" size="sm" className="text-orange-600 dark:text-orange-400 hover:text-orange-700 dark:hover:text-orange-300 transition-colors duration-200">
+                    View <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </li>
+              ))}
+            </ul>
+          </CardContent>
+        </Card>
+        <Card className="bg-white dark:bg-gray-800 transition-colors duration-200">
+          <CardHeader>
+            <CardTitle className="text-gray-900 dark:text-gray-100">Upcoming Pickups</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ul className="space-y-2">
+              {[1, 2, 3].map((pickup) => (
+                <li key={pickup} className="flex items-center justify-between">
+                  <span className="text-gray-600 dark:text-gray-300">Pickup #{pickup}</span>
+                  <Button variant="ghost" size="sm" className="text-orange-600 dark:text-orange-400 hover:text-orange-700 dark:hover:text-orange-300 transition-colors duration-200">
+                    Details <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </li>
+              ))}
+            </ul>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="flex justify-end">
+        <Button asChild className="bg-orange-500 hover:bg-orange-600 text-white dark:bg-orange-600 dark:hover:bg-orange-700 dark:text-white transition-colors duration-200">
+          <Link href="/dashboard/client/new-order">
+            New Waste Disposal Order <ArrowRight className="ml-2 h-4 w-4" />
+          </Link>
+        </Button>
+      </div>
     </div>
   )
 }
+
