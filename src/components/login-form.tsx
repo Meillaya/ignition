@@ -47,9 +47,9 @@ export function LoginForm() {
     setIsLoading(true);
     try {
       const xata = getXataClient();
-      const db = drizzle(xata);
+     
 
-      const db = drizzle(xata, { schema: { usersTable, usersRelations } });
+      const db = drizzle(xata, { schema: { usersTable } });
 
       // Verify user exists
       const user = await db.query.usersTable.findFirst({

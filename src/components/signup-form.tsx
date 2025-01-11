@@ -53,9 +53,9 @@ export function SignupForm() {
     setIsLoading(true);
     try {
       const xata = getXataClient();
-      const db = drizzle(xata);
+      
 
-      const db = drizzle(xata, { schema: { usersTable, usersRelations } });
+      const db = drizzle(xata, { schema: { usersTable} });
 
       // Check if user exists
       const existingUser = await db.query.usersTable.findFirst({
@@ -71,9 +71,12 @@ export function SignupForm() {
 
       // Create user
       const [newUser] = await db.insert(usersTable).values({
+        id: crypto.randomUUID(),
         email: values.email,
         password: hashedPassword,
         role: values.role,
+        createdAt: new Date(),
+        updatedAt: new Date(),
       }).returning();
 
       if (!newUser) {
