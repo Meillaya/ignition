@@ -16,7 +16,8 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { useToast } from '@/components/ui/use-toast'
-import { useAuth } from '@/components/auth-provider'
+import { signIn } from 'next-auth/react'
+import { useRouter } from 'next/navigation'
 
 
 const formSchema = z.object({
@@ -26,7 +27,6 @@ const formSchema = z.object({
 
 export function LoginForm() {
   const router = useRouter()
-  const { login } = useAuth()
   const { toast } = useToast()
   const [isLoading, setIsLoading] = useState(false)
 
@@ -41,19 +41,23 @@ export function LoginForm() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
     try {
-      const user = await login(values.email, values.password);
+      const result = await signIn('credentials', {
+        email: values.email,
+        password: values.password,
+        redirect: false,
+      });
+
+      if (result?.error) {
+        throw new Error(result.error);
+      }
+
       toast({
         title: "Logged in successfully",
         description: "Welcome back to EcoWaste Management!",
       });
-      // Redirect based on user role
-      if (user.role === 'client') {
-        router.push('/dashboard/client');
-      } else if (user.role === 'contractor') {
-        router.push('/dashboard/contractor');
-      } else {
-        throw new Error('Invalid user role');
-      }
+
+      // Redirect to dashboard - NextAuth.js will handle the role-based redirect
+      router.push('/dashboard');
     } catch (error) {
       toast({
         variant: "destructive",
