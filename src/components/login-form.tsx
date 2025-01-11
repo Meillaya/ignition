@@ -46,24 +46,17 @@ export function LoginForm() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
     try {
-      const xata = getXataClient();
-     
-
-      const db = drizzle(xata, { schema: { usersTable } });
-
-      // Verify user exists
-      const user = await db.query.usersTable.findFirst({
-        where: (users, { eq }) => eq(users.email, values.email),
+      const response = await fetch('/api/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(values),
       });
 
-      if (!user) {
-        throw new Error('User not found');
-      }
-
-      // Verify password
-      const passwordMatch = await compare(values.password, user.password);
-      if (!passwordMatch) {
-        throw new Error('Invalid password');
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Login failed');
       }
 
       const result = await signIn('credentials', {

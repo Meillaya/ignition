@@ -52,35 +52,17 @@ export function SignupForm() {
   async function onSignUp(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
     try {
-      const xata = getXataClient();
-      
-
-      const db = drizzle(xata, { schema: { usersTable} });
-
-      // Check if user exists
-      const existingUser = await db.query.usersTable.findFirst({
-        where: (users, { eq }) => eq(users.email, values.email),
+      const response = await fetch('/api/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(values),
       });
 
-      if (existingUser) {
-        throw new Error('User with this email already exists');
-      }
-
-      // Hash password
-      const hashedPassword = await hash(values.password, 12);
-
-      // Create user
-      const [newUser] = await db.insert(usersTable).values({
-        id: crypto.randomUUID(),
-        email: values.email,
-        password: hashedPassword,
-        role: values.role,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      }).returning();
-
-      if (!newUser) {
-        throw new Error('Failed to create user');
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Signup failed');
       }
 
       // Sign in the new user
