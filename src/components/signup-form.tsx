@@ -56,10 +56,9 @@ export function SignupForm() {
       const db = drizzle(xata);
 
       // Check if user exists
-      const existingUser = await db.select()
-        .from(usersTable)
-        .where(eq(usersTable.email, values.email))
-        .get();
+      const existingUser = await db.query.usersTable
+        .findFirst()
+        .where(eq(usersTable.email, values.email));
 
       if (existingUser) {
         throw new Error('User already exists');
