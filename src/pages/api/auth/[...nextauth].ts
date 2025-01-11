@@ -37,6 +37,22 @@ declare module 'next-auth/jwt' {
 
 export default NextAuth({
   secret: process.env.NEXTAUTH_SECRET,
+  debug: process.env.NODE_ENV === 'development',
+  pages: {
+    signIn: '/auth/signin',
+    error: '/auth/error',
+  },
+  cookies: {
+    sessionToken: {
+      name: `__Secure-next-auth.session-token`,
+      options: {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        secure: process.env.NODE_ENV === 'production',
+      },
+    },
+  },
   providers: [
     CredentialsProvider({
       name: 'Credentials',
@@ -45,45 +61,58 @@ export default NextAuth({
         password: { label: "Password", type: "password" }
       },
       async authorize(credentials) {
-        if (!credentials) return null;
+        try {
+          if (!credentials) {
+            console.error('No credentials provided');
+            return null;
+          }
 
-        const xata = getXataClient();
-        const db = drizzle(xata);
-        
-        const users = await db.select()
-          .from(usersTable)
-          .where(eq(usersTable.email, credentials.email))
-          .limit(1);
+          const xata = getXataClient();
+          const db = drizzle(xata);
+          
+          const users = await db.select()
+            .from(usersTable)
+            .where(eq(usersTable.email, credentials.email))
+            .limit(1);
 
-        if (users.length === 0) {
-          throw new Error("User not found");
+          if (users.length === 0) {
+            console.error('User not found:', credentials.email);
+            throw new Error("User not found");
+          }
+
+          const user = users[0];
+          if (!user.password) {
+            console.error('Invalid user configuration:', user.id);
+            throw new Error("Invalid user configuration");
+          }
+          
+          const isValid = await compare(credentials.password, user.password);
+          if (!isValid) {
+            console.error('Invalid password for user:', user.id);
+            throw new Error("Invalid password");
+          }
+
+          // Type assertion is safe here because we've already validated the role
+          const validRole = user.role as 'client' | 'contractor';
+
+          return { 
+            id: user.id.toString(),
+            email: user.email, 
+            role: validRole,
+            name: user.name,
+            age: user.age
+          };
+        } catch (error) {
+          console.error('Authorization error:', error);
+          throw error;
         }
-
-        const user = users[0];
-        if (!user.password) {
-          throw new Error("Invalid user configuration");
-        }
-        
-        const isValid = await compare(credentials.password, user.password);
-        if (!isValid) {
-          throw new Error("Invalid password");
-        }
-
-        // Type assertion is safe here because we've already validated the role
-        const validRole = user.role as 'client' | 'contractor';
-
-        return { 
-          id: user.id.toString(),
-          email: user.email, 
-          role: validRole,
-          name: user.name,
-          age: user.age
-        };
       }
     })
   ],
   session: {
     strategy: 'jwt',
+    maxAge: 30 * 24 * 60 * 60, // 30 days
+    updateAge: 24 * 60 * 60, // 24 hours
   },
   callbacks: {
     async jwt({ token, user }) {
