@@ -2,6 +2,9 @@
 
 import { createContext, useContext, useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import { signIn, signOut, useSession } from 'next-auth/react'
+import { usersTable } from '@/db/schema' 
+import { hash } from 'bcryptjs'
 
 type User = {
   id: string
@@ -34,62 +37,57 @@ export function AuthProvider({
   const [user, setUser] = useState<User | null>(null)
   const [isInitialized, setIsInitialized] = useState(false)
   const router = useRouter()
+  const { data: session, status } = useSession()
 
   useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const storedUser = localStorage.getItem('user')
-        if (storedUser) {
-          setUser(JSON.parse(storedUser))
-        }
-      } catch (error) {
-        console.error('Error checking authentication:', error)
-      } finally {
-        setIsInitialized(true)
-      }
+    if (status === 'authenticated' && session?.user) {
+      setUser({
+        id: session.user.id,
+        email: session.user.email,
+        role: session.user.role as 'client' | 'contractor'
+      })
+    } else {
+      setUser(null)
     }
-
-    checkAuth()
-  }, [])
+    setIsInitialized(true)
+  }, [session, status])
 
   const login = async (email: string, password: string): Promise<User> => {
-    try {
-      // Simulate API call - replace with actual authentication
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      const mockUser = { id: '1', email, role: Math.random() > 0.5 ? 'client' : 'contractor' as const }
-      setUser(mockUser)
-      localStorage.setItem('user', JSON.stringify(mockUser))
-      return mockUser
-    } catch (error) {
-      console.error('Login error:', error)
-      throw error
+    const result = await signIn('credentials', {
+      email,
+      password,
+      redirect: false,
+    })
+
+    if (result?.error) {
+      throw new Error(result.error)
+    }
+
+    return {
+      id: session?.user.id || '',
+      email: session?.user.email || '',
+      role: session?.user.role as 'client' | 'contractor'
     }
   }
 
-  const logout = () => {
-    try {
-      setUser(null)
-      localStorage.removeItem('user')
-      router.push('/')
-    } catch (error) {
-      console.error('Logout error:', error)
-    }
+  const logout = async () => {
+    await signOut({ redirect: false })
+    setUser(null)
+    router.push('/')
   }
 
   const signup = async (email: string, password: string, role: 'client' | 'contractor') => {
-    try {
-      // Simulate API call - replace with actual registration
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      const mockUser = { id: '2', email, role }
-      setUser(mockUser)
-      localStorage.setItem('user', JSON.stringify(mockUser))
-    } catch (error) {
-      console.error('Signup error:', error)
-      throw error
-    }
+    const hashedPassword = await hash(password, 12)
+
+    await db.insert(usersTable).values({
+      email,
+      password: hashedPassword,
+      role,
+    })
+
+    await login(email, password)
   }
 
-  // Don't render children until authentication is initialized
   if (!isInitialized) {
     return null // Or a loading spinner
   }
@@ -100,4 +98,3 @@ export function AuthProvider({
     </AuthContext.Provider>
   )
 }
-

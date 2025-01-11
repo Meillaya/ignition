@@ -23,9 +23,6 @@ import {
 } from '@/components/ui/select'
 import { useAuth } from '@/components/auth-provider'
 import { useToast } from '@/components/ui/use-toast'
-import { usersTable } from '@/db/schema'; // Import your users table schema
-import { eq } from 'drizzle-orm'; // Import Drizzle ORM utilities
-import bcrypt from 'bcryptjs'; // For hashing passwords
 
 const formSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
@@ -48,21 +45,21 @@ export function SignupForm() {
   })
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    setIsLoading(true)
+    setIsLoading(true);
     try {
-      await signup(values.email, values.password, values.role)
+      await signup(values.email, values.password, values.role);
       toast({
         title: "Account created successfully",
         description: "Welcome to Fox In The Truck Management!",
-      })
+      });
     } catch (error) {
       toast({
         variant: "destructive",
         title: "Signup failed",
         description: "There was an error creating your account. Please try again.",
-      })
+      });
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
   }
 
