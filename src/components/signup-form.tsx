@@ -23,7 +23,8 @@ import {
 } from './ui/select'
 import { useAuth } from './auth-provider'
 import { useToast } from './ui/use-toast'
-import { supabase } from '@/lib/supabaseClient';
+import { getXataClient } from '@/lib/xata';
+import bcrypt from 'bcryptjs';
 
 const formSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
@@ -49,32 +50,24 @@ export function SignupForm() {
   async function onSignUp(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
     try {
-      // First create auth user
-      const { data: authData, error: authError } = await supabase.auth.signUp({
+      const xata = getXataClient();
+      
+      // Hash the password
+      const hashedPassword = await bcrypt.hash(values.password, 10);
+      
+      // Create user in Xata
+      const user = await xata.db.users.create({
         email: values.email,
-        password: values.password,
-        options: {
-          data: {
-            role: values.role
-          }
-        }
+        password: hashedPassword,
+        role: values.role
       });
 
-      if (authError) throw authError;
-
-      // Then create profile in public.users table
-      const { error: profileError } = await supabase
-        .from('users')
-        .insert({
-          id: authData.user?.id,
-          email: values.email,
-          role: values.role
-        });
-
-      if (profileError) throw profileError;
+      if (!user) {
+        throw new Error('Failed to create user');
+      }
       toast({
-        title: "Check your email",
-        description: "We sent you an email with a link to confirm your email address.",
+        title: "Account created successfully",
+        description: "You can now log in with your credentials.",
       });
     } catch (error) {
       console.error('Signup error:', error);
