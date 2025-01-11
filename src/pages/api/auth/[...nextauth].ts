@@ -5,8 +5,32 @@ import { drizzle } from 'drizzle-orm/xata-http';
 import { usersTable } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import { compare } from 'bcryptjs';
-import {Session} from 'next-auth'
-import {JWT} from 'next-auth/jwt'
+import { DefaultSession, Session } from 'next-auth'
+import { JWT } from 'next-auth/jwt'
+
+declare module 'next-auth' {
+  interface Session extends DefaultSession {
+    user: {
+      id: string;
+      email: string;
+      role: 'client' | 'contractor';
+    } & DefaultSession['user']
+  }
+
+  interface User {
+    id: string;
+    email: string;
+    role: 'client' | 'contractor';
+  }
+}
+
+declare module 'next-auth/jwt' {
+  interface JWT {
+    id: string;
+    email: string;
+    role: 'client' | 'contractor';
+  }
+}
 
 
 export default NextAuth({
@@ -39,7 +63,7 @@ export default NextAuth({
           throw new Error("Invalid password");
         }
 
-        return { id: user[0].id, email: user[0].email, role: user[0].role };
+        return { id: user.id, email: user.email, role: user.role };
       }
     })
   ],
@@ -56,10 +80,10 @@ export default NextAuth({
       return token;
     },
     async session({ session, token }) {
-      if (token) {
-        session.user.id = token.id as string;
-        session.user.role = token.role as 'client' | 'contractor';
-        session.user.email = token.email as string;
+      if (token && session.user) {
+        session.user.id = token.id;
+        session.user.role = token.role;
+        session.user.email = token.email;
       }
       return session;
     }
