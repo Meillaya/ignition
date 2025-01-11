@@ -7,6 +7,7 @@ import { getXataClient } from '@/xata';
 import { drizzle } from 'drizzle-orm/xata-http';
 import { usersTable } from '@/db/schema';
 import { hash } from 'bcryptjs';
+import { eq } from 'drizzle-orm';
 
 type User = {
   id: string
