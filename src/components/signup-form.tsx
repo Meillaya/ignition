@@ -46,24 +46,43 @@ export function SignupForm() {
   })
 
 
-  async function onSignUp (values: { email: string; password: string }) {
-    setIsLoading(true)
+  async function onSignUp(values: z.infer<typeof formSchema>) {
+    setIsLoading(true);
     try {
-      const {error} = await supabase.auth.signUp({
+      // First create auth user
+      const { data: authData, error: authError } = await supabase.auth.signUp({
         email: values.email,
         password: values.password,
+        options: {
+          data: {
+            role: values.role
+          }
+        }
       });
-      if (error) throw error;
+
+      if (authError) throw authError;
+
+      // Then create profile in public.users table
+      const { error: profileError } = await supabase
+        .from('users')
+        .insert({
+          id: authData.user?.id,
+          email: values.email,
+          role: values.role
+        });
+
+      if (profileError) throw profileError;
       toast({
         title: "Check your email",
         description: "We sent you an email with a link to confirm your email address.",
-      })
+      });
     } catch (error) {
+      console.error('Signup error:', error);
       toast({
         variant: "destructive",
         title: "Sign up failed",
-        description: "Please check your credentials and try again.",
-      })
+        description: error instanceof Error ? error.message : "An unexpected error occurred",
+      });
     } finally {
       setIsLoading(false)
     }
