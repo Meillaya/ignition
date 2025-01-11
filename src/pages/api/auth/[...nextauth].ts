@@ -20,7 +20,9 @@ declare module 'next-auth' {
   interface User {
     id: string;
     email: string;
-    role: 'client' | 'contractor';
+    role: string;
+    name?: string | null;
+    age?: number | null;
   }
 }
 
@@ -58,12 +60,24 @@ export default NextAuth({
         }
 
         const user = users[0];
+        if (!user.password) {
+          throw new Error("Invalid user configuration");
+        }
+        
         const isValid = await compare(credentials.password, user.password);
         if (!isValid) {
           throw new Error("Invalid password");
         }
 
-        return { id: user.id, email: user.email, role: user.role };
+        if (!user.role || (user.role !== 'client' && user.role !== 'contractor')) {
+          throw new Error("Invalid user role");
+        }
+
+        return { 
+          id: user.id.toString(), // Convert number ID to string
+          email: user.email, 
+          role: user.role 
+        };
       }
     })
   ],
