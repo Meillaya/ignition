@@ -21,10 +21,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from './ui/select'
-import { useAuth } from './auth-provider'
+import { signIn } from 'next-auth/react'
 import { useToast } from './ui/use-toast'
-import { drizzle } from 'drizzle-orm/node-postgres';
-import bcrypt from 'bcryptjs';
+import { drizzle } from 'drizzle-orm/xata-http';
+import { getXataClient } from '@/xata';
+import { usersTable } from '@/db/schema';
+import { hash } from 'bcryptjs';
+import { eq } from 'drizzle-orm';
 
 const formSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
@@ -33,7 +36,6 @@ const formSchema = z.object({
 })
 
 export function SignupForm() {
-  const { signup } = useAuth()
   const { toast } = useToast()
   const [isLoading, setIsLoading] = useState(false)
 
@@ -50,7 +52,39 @@ export function SignupForm() {
   async function onSignUp(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
     try {
-      await signup(values.email, values.password, values.role);
+      // Create user in database
+      const xata = getXataClient();
+      const db = drizzle(xata, { schema: { usersTable } });
+      
+      // Check if user exists
+      const existingUser = await db.query.usersTable.findFirst({
+        where: (users, { eq }) => eq(users.email, values.email),
+      });
+
+      if (existingUser) {
+        throw new Error('User already exists');
+      }
+
+      // Hash password
+      const hashedPassword = await hash(values.password, 12);
+
+      // Create user
+      await db.insert(usersTable).values({
+        email: values.email,
+        password: hashedPassword,
+        role: values.role,
+      });
+
+      // Sign in the new user
+      const result = await signIn('credentials', {
+        email: values.email,
+        password: values.password,
+        redirect: false,
+      });
+
+      if (result?.error) {
+        throw new Error(result.error);
+      }
       toast({
         title: "Account created successfully",
         description: "You can now log in with your credentials.",
