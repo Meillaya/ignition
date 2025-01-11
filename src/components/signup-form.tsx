@@ -47,9 +47,19 @@ export function SignupForm() {
       role: undefined,
       age: undefined,
     },
+    mode: 'onChange', // Validate on change
   })
 
+  // Add form state logging
+  useEffect(() => {
+    const subscription = form.watch((value, { name, type }) => {
+      console.log('Form field changed:', { name, type, value })
+    })
+    return () => subscription.unsubscribe()
+  }, [form.watch])
+
   async function onSubmit(values: z.infer<typeof formSchema>) {
+    console.log('Form onSubmit triggered!'); // Simple test log
     setIsLoading(true);
     console.log('Form submitted with values:', values);
 
@@ -80,7 +90,16 @@ export function SignupForm() {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form 
+        onSubmit={(e) => {
+          console.log('Form submit event triggered');
+          e.preventDefault(); // Prevent default form submission
+          form.handleSubmit(onSubmit)(e).catch((error) => {
+            console.error('Form submission error:', error);
+          });
+        }} 
+        className="space-y-4"
+      >
         <FormField
           control={form.control}
           name="email"
@@ -132,6 +151,14 @@ export function SignupForm() {
           {isLoading ? "Creating account..." : "Sign up"}
         </Button>
       </form>
+      
+      {/* Test button outside form */}
+      <Button 
+        onClick={() => console.log('Test button clicked!')}
+        className="mt-4"
+      >
+        Test Button
+      </Button>
     </Form>
   )
 }
