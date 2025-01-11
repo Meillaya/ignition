@@ -23,8 +23,6 @@ type AuthContextType = {
     email: string, 
     password: string, 
     role: 'client' | 'contractor',
-    name?: string,
-    age?: number
   ) => Promise<void>
 }
 

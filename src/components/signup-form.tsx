@@ -23,7 +23,7 @@ import {
 } from './ui/select'
 import { useAuth } from './auth-provider'
 import { useToast } from './ui/use-toast'
-import { getXataClient } from '@/lib/xata';
+import { drizzle } from 'drizzle-orm/node-postgres';
 import bcrypt from 'bcryptjs';
 
 const formSchema = z.object({
@@ -50,7 +50,7 @@ export function SignupForm() {
   async function onSignUp(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
     try {
-      const xata = getXataClient();
+      const xata = new XataClient();
       
       // Hash the password
       const hashedPassword = await bcrypt.hash(values.password, 10);
