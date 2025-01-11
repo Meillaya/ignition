@@ -52,14 +52,14 @@ export function SignupForm() {
   async function onSignUp(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
     try {
-      // Create user in database
       const xata = getXataClient();
-      const db = drizzle(xata, { schema: { usersTable } });
-      
+      const db = drizzle(xata);
+
       // Check if user exists
-      const existingUser = await db.query.usersTable.findFirst({
-        where: (users, { eq }) => eq(users.email, values.email),
-      });
+      const existingUser = await db.select()
+        .from(usersTable)
+        .where(eq(usersTable.email, values.email))
+        .get();
 
       if (existingUser) {
         throw new Error('User already exists');
@@ -68,12 +68,13 @@ export function SignupForm() {
       // Hash password
       const hashedPassword = await hash(values.password, 12);
 
-      // Create user
-      await db.insert(usersTable).values({
+      // Create user with Xata ID
+      const newUser = await db.insert(usersTable).values({
+        id: crypto.randomUUID(),
         email: values.email,
         password: hashedPassword,
         role: values.role,
-      });
+      }).returning().get();
 
       // Sign in the new user
       const result = await signIn('credentials', {

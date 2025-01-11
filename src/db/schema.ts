@@ -11,24 +11,14 @@ import * as t from "drizzle-orm/pg-core";
 //   updatedAt: timestamp("updated_at").defaultNow(),
 // });
 
-export const usersTable = pgTable(
-  "users",
-  {
-    id: t.integer().primaryKey().generatedAlwaysAsIdentity(),
-    // firstName: t.varchar("first_name", { length: 256 }),
-    // lastName: t.varchar("last_name", { length: 256 }),
-    email: t.varchar().notNull(),
-    role: rolesEnum(),
-    password: varchar("password", { length: 255 }).notNull(),
-    createdAt: timestamp("created_at").defaultNow(),
-    updatedAt: timestamp("updated_at").defaultNow(),
-  },
-  (table) => {
-    return {
-      emailIndex: t.uniqueIndex("email_idx").on(table.email),
-    };
-  }
-);
+export const usersTable = pgTable("users", {
+  id: varchar("id", { length: 255 }).primaryKey(),
+  email: varchar("email", { length: 255 }).notNull().unique(),
+  password: varchar("password", { length: 255 }).notNull(),
+  role: rolesEnum("role").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
 
 // export const posts = table(
 //   "posts",

@@ -17,6 +17,11 @@ import {
 import { Input } from '@/components/ui/input'
 import { useToast } from '@/components/ui/use-toast'
 import { signIn } from 'next-auth/react'
+import { drizzle } from 'drizzle-orm/xata-http'
+import { getXataClient } from '@/xata'
+import { usersTable } from '@/db/schema'
+import { eq } from 'drizzle-orm'
+import { compare } from 'bcryptjs'
 
 
 
@@ -41,6 +46,24 @@ export function LoginForm() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
     try {
+      const xata = getXataClient();
+      const db = drizzle(xata);
+
+      // Verify user exists and password matches
+      const user = await db.select()
+        .from(usersTable)
+        .where(eq(usersTable.email, values.email))
+        .get();
+
+      if (!user) {
+        throw new Error('User not found');
+      }
+
+      const passwordMatch = await compare(values.password, user.password);
+      if (!passwordMatch) {
+        throw new Error('Invalid password');
+      }
+
       const result = await signIn('credentials', {
         email: values.email,
         password: values.password,
