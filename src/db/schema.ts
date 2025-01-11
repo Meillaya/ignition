@@ -1,25 +1,14 @@
-import { AnyPgColumn } from "drizzle-orm/pg-core";
-import { pgEnum, pgTable as table } from "drizzle-orm/pg-core";
-import * as t from "drizzle-orm/pg-core";
+import { pgTable, serial, varchar, timestamp } from "drizzle-orm/pg-core";
+import { rolesEnum } from "./enums";
 
-export const rolesEnum = pgEnum("roles", ["client", "contractor"]);
-
-export const users = table(
-  "users",
-  {
-    id: t.integer().primaryKey().generatedAlwaysAsIdentity(),
-    firstName: t.varchar("first_name", { length: 256 }),
-    lastName: t.varchar("last_name", { length: 256 }),
-    email: t.varchar().notNull(),
-    invitee: t.integer().references((): AnyPgColumn => users.id),
-    role: rolesEnum(),
-  },
-  (table) => {
-    return {
-      emailIndex: t.uniqueIndex("email_idx").on(table.email),
-    };
-  }
-);
+export const usersTable = pgTable("users", {
+  id: serial("id").primaryKey(),
+  email: varchar("email", { length: 255 }).notNull().unique(),
+  password: varchar("password", { length: 255 }).notNull(),
+  role: rolesEnum("role").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
 
 export const posts = table(
   "posts",

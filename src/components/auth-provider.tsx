@@ -114,49 +114,35 @@ export function AuthProvider({
   const signup = async (
     email: string, 
     password: string, 
-    role: 'client' | 'contractor',
-    name?: string,
-    age?: number
+    role: 'client' | 'contractor'
   ) => {
     try {
       console.log('Starting signup process...');
       const xata = getXataClient();
       const db = drizzle(xata);
-      console.log('Xata client and drizzle initialized.');
       
       // Check if user already exists
-      console.log('Checking for existing user with email:', email);
-      const existingUser = await db.select()
-        .from(usersTable)
-        .where(eq(usersTable.email, email))
-        .limit(1);
+      const existingUser = await db.query.usersTable.findFirst({
+        where: (users, { eq }) => eq(users.email, email),
+      });
 
-      if (existingUser.length > 0) {
-        console.error('User already exists:', existingUser);
+      if (existingUser) {
         throw new Error('User already exists');
       }
-      console.log('No existing user found.');
 
       // Hash password
-      console.log('Hashing password...');
       const hashedPassword = await hash(password, 12);
-      console.log('Password hashed successfully.');
 
       // Create user in database
-      console.log('Creating user in database...');
       const [newUser] = await db.insert(usersTable).values({
-        name: name || email.split('@')[0],
-        age: age || 0,
         email,
         password: hashedPassword,
         role,
       }).returning();
 
       if (!newUser) {
-        console.error('Failed to create user in database');
         throw new Error('Failed to create user');
       }
-      console.log('User created successfully:', newUser);
 
       // Automatically log in the new user
       console.log('Attempting to log in new user...');

@@ -50,21 +50,7 @@ export function SignupForm() {
   async function onSignUp(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
     try {
-      const xata = new XataClient();
-      
-      // Hash the password
-      const hashedPassword = await bcrypt.hash(values.password, 10);
-      
-      // Create user in Xata
-      const user = await xata.db.users.create({
-        email: values.email,
-        password: hashedPassword,
-        role: values.role
-      });
-
-      if (!user) {
-        throw new Error('Failed to create user');
-      }
+      await signup(values.email, values.password, values.role);
       toast({
         title: "Account created successfully",
         description: "You can now log in with your credentials.",
