@@ -59,9 +59,17 @@ export function SignupForm() {
   }, [form.watch])
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log('Form onSubmit triggered!'); // Simple test log
+    console.log('Form onSubmit triggered!');
     setIsLoading(true);
     console.log('Form submitted with values:', values);
+
+    // Add validation check
+    try {
+      const result = formSchema.safeParse(values);
+      if (!result.success) {
+        console.error('Form data validation failed:', result.error);
+        throw new Error('Invalid form data');
+      }
 
     try {
       console.log('Attempting to create user...');
@@ -73,6 +81,10 @@ export function SignupForm() {
         description: "Welcome to Fox In The Truck Management!",
       });
       console.log('Toast notification shown for success.');
+      
+      // Force refresh to ensure session is updated
+      console.log('Refreshing page...');
+      window.location.href = values.role === 'client' ? '/dashboard/client' : '/dashboard/contractor';
     } catch (error) {
       console.error('Signup failed:', error);
 
@@ -91,12 +103,28 @@ export function SignupForm() {
   return (
     <Form {...form}>
       <form 
-        onSubmit={(e) => {
+        onSubmit={async (e) => {
           console.log('Form submit event triggered');
-          e.preventDefault(); // Prevent default form submission
-          form.handleSubmit(onSubmit)(e).catch((error) => {
+          e.preventDefault();
+          
+          try {
+            console.log('Validating form...');
+            const isValid = await form.trigger();
+            if (!isValid) {
+              console.error('Form validation failed');
+              return;
+            }
+            
+            console.log('Form is valid, calling onSubmit...');
+            await form.handleSubmit(onSubmit)(e);
+          } catch (error) {
             console.error('Form submission error:', error);
-          });
+            toast({
+              variant: "destructive",
+              title: "Form submission failed",
+              description: error instanceof Error ? error.message : "An unexpected error occurred",
+            });
+          }
         }} 
         className="space-y-4"
       >
