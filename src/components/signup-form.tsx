@@ -36,6 +36,7 @@ export function SignupForm() {
   const { signup } = useAuth()
   const { toast } = useToast()
   const [isLoading, setIsLoading] = useState(false)
+  const router = useRouter()
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -60,7 +61,7 @@ export function SignupForm() {
       toast({
         variant: "destructive",
         title: "Signup failed",
-        description: "There was an error creating your account. Please try again.",
+        description: error instanceof Error ? error.message : "There was an error creating your account. Please try again.",
       });
     } finally {
       setIsLoading(false);

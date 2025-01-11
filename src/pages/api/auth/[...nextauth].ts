@@ -73,9 +73,11 @@ export default NextAuth({
         const validRole = user.role as 'client' | 'contractor';
 
         return { 
-          id: user.id.toString(), // Convert number ID to string
+          id: user.id.toString(),
           email: user.email, 
-          role: validRole 
+          role: validRole,
+          name: user.name,
+          age: user.age
         };
       }
     })

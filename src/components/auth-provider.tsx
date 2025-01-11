@@ -103,17 +103,55 @@ export function AuthProvider({
     const xata = getXataClient();
     const db = drizzle(xata);
     
+    // Check if user already exists
+    const existingUser = await db.select()
+      .from(usersTable)
+      .where(eq(usersTable.email, email))
+      .limit(1);
+
+    if (existingUser.length > 0) {
+      throw new Error('User already exists');
+    }
+
     const hashedPassword = await hash(password, 12);
 
-    await db.insert(usersTable).values({
+    // Create user in database
+    const [newUser] = await db.insert(usersTable).values({
       name: name || email.split('@')[0],
       age: age || 0,
       email,
       password: hashedPassword,
       role,
-    })
+    }).returning();
 
-    await login(email, password)
+    if (!newUser) {
+      throw new Error('Failed to create user');
+    }
+
+    // Automatically log in the new user
+    const result = await signIn('credentials', {
+      email,
+      password,
+      redirect: false,
+    });
+
+    if (result?.error) {
+      throw new Error(result.error);
+    }
+
+    // Wait for session to update
+    await new Promise(resolve => setTimeout(resolve, 100));
+
+    if (!session?.user) {
+      throw new Error('Login failed - no session created');
+    }
+
+    // Redirect based on role
+    if (role === 'client') {
+      router.push('/dashboard/client');
+    } else {
+      router.push('/dashboard/contractor');
+    }
   }
 
   if (!isInitialized) {
