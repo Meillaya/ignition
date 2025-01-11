@@ -56,12 +56,13 @@ export function SignupForm() {
       const db = drizzle(xata);
 
       // Check if user exists
-      const existingUser = await db.query.usersTable
-        .findFirst()
-        .where(eq(usersTable.email, values.email));
+      const existingUser = await db.select()
+        .from(usersTable)
+        .where(eq(usersTable.email, values.email))
+        .get();
 
       if (existingUser) {
-        throw new Error('User already exists');
+        throw new Error('User with this email already exists');
       }
 
       // Hash password
@@ -73,7 +74,13 @@ export function SignupForm() {
         email: values.email,
         password: hashedPassword,
         role: values.role,
+        createdAt: new Date(),
+        updatedAt: new Date(),
       }).returning().get();
+
+      if (!newUser) {
+        throw new Error('Failed to create user');
+      }
 
       // Sign in the new user
       const result = await signIn('credentials', {
