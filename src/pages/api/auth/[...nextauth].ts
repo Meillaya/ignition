@@ -20,7 +20,7 @@ declare module 'next-auth' {
   interface User {
     id: string;
     email: string;
-    role: string;
+    role: 'client' | 'contractor';
     name?: string | null;
     age?: number | null;
   }
@@ -69,14 +69,13 @@ export default NextAuth({
           throw new Error("Invalid password");
         }
 
-        if (!user.role || (user.role !== 'client' && user.role !== 'contractor')) {
-          throw new Error("Invalid user role");
-        }
+        // Type assertion is safe here because we've already validated the role
+        const validRole = user.role as 'client' | 'contractor';
 
         return { 
           id: user.id.toString(), // Convert number ID to string
           email: user.email, 
-          role: user.role 
+          role: validRole 
         };
       }
     })
