@@ -1,30 +1,50 @@
-import { pgTable, serial, varchar, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, serial, varchar, timestamp,  } from "drizzle-orm/pg-core";
 import { rolesEnum } from "./enums";
+import * as t from "drizzle-orm/pg-core";
 
-export const usersTable = pgTable("users", {
-  id: serial("id").primaryKey(),
-  email: varchar("email", { length: 255 }).notNull().unique(),
-  password: varchar("password", { length: 255 }).notNull(),
-  role: rolesEnum("role").notNull(),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
-});
+// export const usersTable = pgTable("users", {
+//   id: t.integer().primaryKey().generatedAlwaysAsIdentity(),
+//   email: varchar("email", { length: 255 }).notNull().unique(),
+//   password: varchar("password", { length: 255 }).notNull(),
+//   role: rolesEnum("role").notNull(),
+//   createdAt: timestamp("created_at").defaultNow(),
+//   updatedAt: timestamp("updated_at").defaultNow(),
+// });
 
-export const posts = table(
-  "posts",
+export const usersTable = pgTable(
+  "users",
   {
     id: t.integer().primaryKey().generatedAlwaysAsIdentity(),
-    slug: t.varchar().$default(() => generateUniqueString(16)),
-    title: t.varchar({ length: 256 }),
-    ownerId: t.integer("owner_id").references(() => users.id),
+    // firstName: t.varchar("first_name", { length: 256 }),
+    // lastName: t.varchar("last_name", { length: 256 }),
+    email: t.varchar().notNull(),
+    role: rolesEnum(),
+    password: varchar("password", { length: 255 }).notNull(),
+    createdAt: timestamp("created_at").defaultNow(),
+    updatedAt: timestamp("updated_at").defaultNow(),
   },
   (table) => {
     return {
-      slugIndex: t.uniqueIndex("slug_idx").on(table.slug),
-      titleIndex: t.index("title_idx").on(table.title),
+      emailIndex: t.uniqueIndex("email_idx").on(table.email),
     };
   }
 );
+
+// export const posts = table(
+//   "posts",
+//   {
+//     id: t.integer().primaryKey().generatedAlwaysAsIdentity(),
+//     slug: t.varchar().$default(() => generateUniqueString(16)),
+//     title: t.varchar({ length: 256 }),
+//     ownerId: t.integer("owner_id").references(() => users.id),
+//   },
+//   (table) => {
+//     return {
+//       slugIndex: t.uniqueIndex("slug_idx").on(table.slug),
+//       titleIndex: t.index("title_idx").on(table.title),
+//     };
+//   }
+// );
 
 // export const comments = table("comments", {
 //   id: t.integer().primaryKey().generatedAlwaysAsIdentity(),
