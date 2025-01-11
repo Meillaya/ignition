@@ -5,6 +5,9 @@ import { drizzle } from 'drizzle-orm/xata-http';
 import { usersTable } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import { compare } from 'bcryptjs';
+import {Session} from 'next-auth'
+import {JWT} from 'next-auth/jwt'
+
 
 export default NextAuth({
   secret: process.env.NEXTAUTH_SECRET,
