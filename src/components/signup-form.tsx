@@ -33,7 +33,7 @@ const formSchema = z.object({
 })
 
 export function SignupForm() {
-  const { signup } = useAuth()
+  const { signup, login } = useAuth()
   const { toast } = useToast()
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
@@ -59,30 +59,27 @@ export function SignupForm() {
   }, [form.watch])
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log('Form onSubmit triggered!');
     setIsLoading(true);
-    console.log('Form submitted with values:', values);
-
-    // Add validation check
     try {
-      const result = formSchema.safeParse(values);
-      if (!result.success) {
-        console.error('Form data validation failed:', result.error);
-        throw new Error('Invalid form data');
-      }
       console.log('Attempting to create user...');
-      await signup(values.email, values.password, values.role, values.name, values.age);
-      console.log('User creation successful!');
+      await signup(values.email, values.password, values.role, values.name);
+      
+      const user = await login(values.email, values.password);
+      console.log('User created and logged in successfully:', user);
 
       toast({
         title: "Account created successfully",
         description: "Welcome to Fox In The Truck Management!",
       });
-      console.log('Toast notification shown for success.');
-      
-      // Force refresh to ensure session is updated
-      console.log('Refreshing page...');
-      window.location.href = values.role === 'client' ? '/dashboard/client' : '/dashboard/contractor';
+
+      // Redirect based on user role
+      if (user.role === 'client') {
+        router.push('/dashboard/client');
+      } else if (user.role === 'contractor') {
+        router.push('/dashboard/contractor');
+      } else {
+        throw new Error('Invalid user role');
+      }
     } catch (error) {
       console.error('Signup failed:', error);
 
@@ -101,32 +98,7 @@ export function SignupForm() {
 
   return (
     <Form {...form}>
-      <form 
-        onSubmit={async (e) => {
-          console.log('Form submit event triggered');
-          e.preventDefault();
-          
-          try {
-            console.log('Validating form...');
-            const isValid = await form.trigger();
-            if (!isValid) {
-              console.error('Form validation failed');
-              return;
-            }
-            
-            console.log('Form is valid, calling onSubmit...');
-            await form.handleSubmit(onSubmit)(e);
-          } catch (error) {
-            console.error('Form submission error:', error);
-            toast({
-              variant: "destructive",
-              title: "Form submission failed",
-              description: error instanceof Error ? error.message : "An unexpected error occurred",
-            });
-          }
-        }} 
-        className="space-y-4"
-      >
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         <FormField
           control={form.control}
           name="email"
@@ -178,14 +150,6 @@ export function SignupForm() {
           {isLoading ? "Creating account..." : "Sign up"}
         </Button>
       </form>
-      
-      {/* Test button outside form */}
-      <Button 
-        onClick={() => console.log('Test button clicked!')}
-        className="mt-4"
-      >
-        Test Button
-      </Button>
     </Form>
   )
 }
