@@ -76,7 +76,7 @@ export function SignupForm() {
         role: values.role,
         createdAt: new Date(),
         updatedAt: new Date(),
-      }).returning().get();
+      }).returning({ insertedId: usersTable.id });
 
       if (!newUser) {
         throw new Error('Failed to create user');
