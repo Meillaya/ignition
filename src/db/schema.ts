@@ -11,14 +11,18 @@ import * as t from "drizzle-orm/pg-core";
 //   updatedAt: timestamp("updated_at").defaultNow(),
 // });
 
+import { relations } from 'drizzle-orm';
+
 export const usersTable = pgTable("users", {
-  id: varchar("id", { length: 255 }).primaryKey(),
+  id: varchar("id", { length: 255 }).primaryKey().$defaultFn(() => crypto.randomUUID()),
   email: varchar("email", { length: 255 }).notNull().unique(),
   password: varchar("password", { length: 255 }).notNull(),
   role: rolesEnum("role").notNull(),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
+
+export const usersRelations = relations(usersTable, ({ many }) => ({}));
 
 // export const posts = table(
 //   "posts",

@@ -55,11 +55,12 @@ export function SignupForm() {
       const xata = getXataClient();
       const db = drizzle(xata);
 
+      const db = drizzle(xata, { schema: { usersTable, usersRelations } });
+
       // Check if user exists
-      const existingUser = await db.select()
-        .from(usersTable)
-        .where(eq(usersTable.email, values.email))
-        .get();
+      const existingUser = await db.query.usersTable.findFirst({
+        where: (users, { eq }) => eq(users.email, values.email),
+      });
 
       if (existingUser) {
         throw new Error('User with this email already exists');
@@ -68,15 +69,12 @@ export function SignupForm() {
       // Hash password
       const hashedPassword = await hash(values.password, 12);
 
-      // Create user with Xata ID
-      const newUser = await db.insert(usersTable).values({
-        id: crypto.randomUUID(),
+      // Create user
+      const [newUser] = await db.insert(usersTable).values({
         email: values.email,
         password: hashedPassword,
         role: values.role,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      }).returning({ insertedId: usersTable.id });
+      }).returning();
 
       if (!newUser) {
         throw new Error('Failed to create user');

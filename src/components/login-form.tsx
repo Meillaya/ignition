@@ -49,16 +49,18 @@ export function LoginForm() {
       const xata = getXataClient();
       const db = drizzle(xata);
 
-      // Verify user exists and password matches
-      const user = await db.select()
-        .from(usersTable)
-        .where(eq(usersTable.email, values.email))
-        .get();
+      const db = drizzle(xata, { schema: { usersTable, usersRelations } });
+
+      // Verify user exists
+      const user = await db.query.usersTable.findFirst({
+        where: (users, { eq }) => eq(users.email, values.email),
+      });
 
       if (!user) {
         throw new Error('User not found');
       }
 
+      // Verify password
       const passwordMatch = await compare(values.password, user.password);
       if (!passwordMatch) {
         throw new Error('Invalid password');
