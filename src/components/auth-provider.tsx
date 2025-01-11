@@ -123,7 +123,7 @@ export function AuthProvider({
       
       // Check if user already exists
       const existingUser = await db.query.usersTable.findFirst({
-        where: (users, { eq }) => eq(users.email, email),
+        where: (users: { email: any; }, { eq }: any) => eq(users.email, email),
       });
 
       if (existingUser) {
