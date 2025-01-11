@@ -70,8 +70,6 @@ export function SignupForm() {
         console.error('Form data validation failed:', result.error);
         throw new Error('Invalid form data');
       }
-
-    try {
       console.log('Attempting to create user...');
       await signup(values.email, values.password, values.role, values.name, values.age);
       console.log('User creation successful!');
@@ -98,6 +96,7 @@ export function SignupForm() {
       setIsLoading(false);
       console.log('Signup process completed.');
     }
+  }
   }
 
   return (
