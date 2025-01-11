@@ -3,6 +3,7 @@ import { Geist } from 'next/font/google'
 import { ThemeProvider } from "../components/theme-provider"
 import { AuthProvider } from "../components/auth-provider"
 import { Toaster } from "../components/ui/toaster"
+import { SessionProvider } from 'next-auth/react'
 
 const geist = Geist({
   subsets: ['latin'],
@@ -28,10 +29,12 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <AuthProvider>
-            {children}
-            <Toaster />
-          </AuthProvider>
+          <SessionProvider>
+            <AuthProvider>
+              {children}
+              <Toaster />
+            </AuthProvider>
+          </SessionProvider>
         </ThemeProvider>
       </body>
     </html>
