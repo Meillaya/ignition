@@ -50,7 +50,7 @@ export function AuthProvider({
         if (status === 'authenticated' && session?.user) {
           console.log('User authenticated:', session.user);
           setUser({
-            id: session.user.id as string,
+            id: (session.user.id as string),
             email: session.user.email as string,
             role: session.user.role as 'client' | 'contractor'
           });
@@ -94,7 +94,7 @@ export function AuthProvider({
 
     console.log('Session updated successfully:', session.user);
     return {
-      id: session.user.id as string,
+      id: Number(session.user.id),
       email: session.user.email as string,
       role: session.user.role as 'client' | 'contractor'
     }
