@@ -3,8 +3,10 @@
 import { createContext, useContext, useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { signIn, signOut, useSession } from 'next-auth/react'
-import { usersTable } from '@/db/schema' 
-import { hash } from 'bcryptjs'
+import { getXataClient } from '@/xata';
+import { drizzle } from 'drizzle-orm/xata-http';
+import { usersTable } from '@/db/schema';
+import { hash } from 'bcryptjs';
 
 type User = {
   id: string
@@ -16,7 +18,13 @@ type AuthContextType = {
   user: User | null
   login: (email: string, password: string) => Promise<User>
   logout: () => void
-  signup: (email: string, password: string, role: 'client' | 'contractor') => Promise<void>
+  signup: (
+    email: string, 
+    password: string, 
+    role: 'client' | 'contractor',
+    name?: string,
+    age?: number
+  ) => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextType | null>(null)
@@ -76,10 +84,21 @@ export function AuthProvider({
     router.push('/')
   }
 
-  const signup = async (email: string, password: string, role: 'client' | 'contractor') => {
-    const hashedPassword = await hash(password, 12)
+  const signup = async (
+    email: string, 
+    password: string, 
+    role: 'client' | 'contractor',
+    name?: string,
+    age?: number
+  ) => {
+    const xata = getXataClient();
+    const db = drizzle(xata);
+    
+    const hashedPassword = await hash(password, 12);
 
     await db.insert(usersTable).values({
+      name: name || email.split('@')[0],
+      age: age || 0,
       email,
       password: hashedPassword,
       role,

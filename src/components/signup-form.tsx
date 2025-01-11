@@ -25,9 +25,11 @@ import { useAuth } from '@/components/auth-provider'
 import { useToast } from '@/components/ui/use-toast'
 
 const formSchema = z.object({
+  name: z.string().min(2, { message: "Name must be at least 2 characters" }),
   email: z.string().email({ message: "Invalid email address" }),
   password: z.string().min(8, { message: "Password must be at least 8 characters" }),
   role: z.enum(['client', 'contractor'], { required_error: "Please select a role" }),
+  age: z.number().min(18, { message: "You must be at least 18 years old" }).optional(),
 })
 
 export function SignupForm() {
@@ -38,16 +40,18 @@ export function SignupForm() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      name: "",
       email: "",
       password: "",
       role: undefined,
+      age: undefined,
     },
   })
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
     try {
-      await signup(values.email, values.password, values.role);
+      await signup(values.email, values.password, values.role, values.name, values.age);
       toast({
         title: "Account created successfully",
         description: "Welcome to Fox In The Truck Management!",
