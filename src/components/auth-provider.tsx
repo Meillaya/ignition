@@ -49,19 +49,21 @@ export function AuthProvider({
   const { data: session, status } = useSession()
 
   useEffect(() => {
-    if (status === 'authenticated' && session?.user) {
-      setUser({
-        id: session.user.id as string,
-        email: session.user.email as string,
-        role: session.user.role as 'client' | 'contractor'
-      })
-    } else if (status === 'unauthenticated') {
-      setUser(null)
-    }
-    if (status !== 'loading') {
-      setIsInitialized(true)
-    }
-  }, [session, status])
+    const checkSession = async () => {
+      if (status === 'authenticated' && session?.user) {
+        setUser({
+          id: session.user.id as string,
+          email: session.user.email as string,
+          role: session.user.role as 'client' | 'contractor'
+        });
+      } else if (status === 'unauthenticated') {
+        setUser(null);
+      }
+      setIsInitialized(true);
+    };
+
+    checkSession();
+  }, [session, status]);
 
   const login = async (email: string, password: string): Promise<User> => {
     const result = await signIn('credentials', {
@@ -101,57 +103,59 @@ export function AuthProvider({
     name?: string,
     age?: number
   ) => {
-    const xata = getXataClient();
-    const db = drizzle(xata);
-    
-    // Check if user already exists
-    const existingUser = await db.select()
-      .from(usersTable)
-      .where(eq(usersTable.email, email))
-      .limit(1);
+    try {
+      const xata = getXataClient();
+      const db = drizzle(xata);
+      
+      // Check if user already exists
+      const existingUser = await db.select()
+        .from(usersTable)
+        .where(eq(usersTable.email, email))
+        .limit(1);
 
-    if (existingUser.length > 0) {
-      throw new Error('User already exists');
-    }
+      if (existingUser.length > 0) {
+        throw new Error('User already exists');
+      }
 
-    const hashedPassword = await hash(password, 12);
+      const hashedPassword = await hash(password, 12);
 
-    // Create user in database
-    const [newUser] = await db.insert(usersTable).values({
-      name: name || email.split('@')[0],
-      age: age || 0,
-      email,
-      password: hashedPassword,
-      role,
-    }).returning();
+      // Create user in database
+      const [newUser] = await db.insert(usersTable).values({
+        name: name || email.split('@')[0],
+        age: age || 0,
+        email,
+        password: hashedPassword,
+        role,
+      }).returning();
 
-    if (!newUser) {
-      throw new Error('Failed to create user');
-    }
+      if (!newUser) {
+        throw new Error('Failed to create user');
+      }
 
-    // Automatically log in the new user
-    const result = await signIn('credentials', {
-      email,
-      password,
-      redirect: false,
-    });
+      // Automatically log in the new user
+      const result = await signIn('credentials', {
+        email,
+        password,
+        redirect: false,
+      });
 
-    if (result?.error) {
-      throw new Error(result.error);
-    }
+      if (result?.error) {
+        console.error('SignIn Error:', result.error);
+        throw new Error(result.error);
+      }
 
-    // Wait for session to update
-    await new Promise(resolve => setTimeout(resolve, 100));
+      // Wait for session to update
+      await new Promise(resolve => setTimeout(resolve, 500));
 
-    if (!session?.user) {
-      throw new Error('Login failed - no session created');
-    }
-
-    // Redirect based on role
-    if (role === 'client') {
-      router.push('/dashboard/client');
-    } else {
-      router.push('/dashboard/contractor');
+      // Redirect based on role
+      if (role === 'client') {
+        router.push('/dashboard/client');
+      } else {
+        router.push('/dashboard/contractor');
+      }
+    } catch (error) {
+      console.error('Signup Error:', error);
+      throw error;
     }
   }
 
