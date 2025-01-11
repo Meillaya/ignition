@@ -97,7 +97,7 @@ export function SignupForm() {
       console.log('Signup process completed.');
     }
   }
-  }
+  
 
   return (
     <Form {...form}>
