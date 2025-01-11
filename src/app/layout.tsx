@@ -1,9 +1,6 @@
 import type { Metadata } from 'next'
 import { Geist } from 'next/font/google'
-import { ThemeProvider } from "../components/theme-provider"
-import { AuthProvider } from "../components/auth-provider"
-import { Toaster } from "../components/ui/toaster"
-import { SessionProvider } from 'next-auth/react'
+import ClientLayout from './client-layout'
 
 const geist = Geist({
   subsets: ['latin'],
@@ -23,19 +20,9 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${geist.variable} font-sans antialiased`}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <SessionProvider>
-            <AuthProvider>
-              {children}
-              <Toaster />
-            </AuthProvider>
-          </SessionProvider>
-        </ThemeProvider>
+        <ClientLayout>
+          {children}
+        </ClientLayout>
       </body>
     </html>
   )
