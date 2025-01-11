@@ -21,16 +21,17 @@ export default NextAuth({
         const xata = getXataClient();
         const db = drizzle(xata);
         
-        const [user] = await db.select()
+        const users = await db.select()
           .from(usersTable)
           .where(eq(usersTable.email, credentials.email))
           .limit(1);
 
-        if (user.length === 0) {
+        if (users.length === 0) {
           throw new Error("User not found");
         }
 
-        const isValid = await compare(credentials.password, user[0].password);
+        const user = users[0];
+        const isValid = await compare(credentials.password, user.password);
         if (!isValid) {
           throw new Error("Invalid password");
         }
@@ -43,16 +44,20 @@ export default NextAuth({
     strategy: 'jwt',
   },
   callbacks: {
-    async jwt(token, user) {
+    async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
         token.role = user.role;
+        token.email = user.email;
       }
       return token;
     },
-    async session({session, token}) {
-      session.user.id = token.id;
-      session.user.role = token.role;
+    async session({ session, token }) {
+      if (token) {
+        session.user.id = token.id as string;
+        session.user.role = token.role as 'client' | 'contractor';
+        session.user.email = token.email as string;
+      }
       return session;
     }
   }

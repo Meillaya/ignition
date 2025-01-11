@@ -50,14 +50,16 @@ export function AuthProvider({
   useEffect(() => {
     if (status === 'authenticated' && session?.user) {
       setUser({
-        id: session.user.id,
-        email: session.user.email,
+        id: session.user.id as string,
+        email: session.user.email as string,
         role: session.user.role as 'client' | 'contractor'
       })
-    } else {
+    } else if (status === 'unauthenticated') {
       setUser(null)
     }
-    setIsInitialized(true)
+    if (status !== 'loading') {
+      setIsInitialized(true)
+    }
   }, [session, status])
 
   const login = async (email: string, password: string): Promise<User> => {
@@ -71,10 +73,17 @@ export function AuthProvider({
       throw new Error(result.error)
     }
 
+    // Wait for session to update
+    await new Promise(resolve => setTimeout(resolve, 100));
+
+    if (!session?.user) {
+      throw new Error('Login failed - no session created');
+    }
+
     return {
-      id: session?.user.id || '',
-      email: session?.user.email || '',
-      role: session?.user.role as 'client' | 'contractor'
+      id: session.user.id as string,
+      email: session.user.email as string,
+      role: session.user.role as 'client' | 'contractor'
     }
   }
 
