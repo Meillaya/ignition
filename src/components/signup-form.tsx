@@ -1,10 +1,10 @@
 "use client"
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
-import { Button } from '@/components/ui/button'
+import { Button } from './ui/button'
 import {
   Form,
   FormControl,
@@ -12,93 +12,66 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
+} from './ui/form'
+import { Input } from './ui/input'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
-import { useAuth } from '@/components/auth-provider'
-import { useToast } from '@/components/ui/use-toast'
-import { useRouter } from 'next/navigation'
+} from './ui/select'
+import { useAuth } from './auth-provider'
+import { useToast } from './ui/use-toast'
+import { supabase } from '@/lib/supabaseClient';
+
 const formSchema = z.object({
-  name: z.string().min(2, { message: "Name must be at least 2 characters" }),
   email: z.string().email({ message: "Invalid email address" }),
   password: z.string().min(8, { message: "Password must be at least 8 characters" }),
   role: z.enum(['client', 'contractor'], { required_error: "Please select a role" }),
-  age: z.number().min(18, { message: "You must be at least 18 years old" }).optional(),
 })
 
 export function SignupForm() {
-  const { signup, login } = useAuth()
+  const { signup } = useAuth()
   const { toast } = useToast()
   const [isLoading, setIsLoading] = useState(false)
-  const router = useRouter()
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: "",
       email: "",
       password: "",
       role: undefined,
-      age: undefined,
     },
-    mode: 'onChange', // Validate on change
   })
 
-  // Add form state logging
-  useEffect(() => {
-    const subscription = form.watch((value, { name, type }) => {
-      console.log('Form field changed:', { name, type, value })
-    })
-    return () => subscription.unsubscribe()
-  }, [form.watch])
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
-    setIsLoading(true);
+  async function onSignUp (values: { email: string; password: string }) {
+    setIsLoading(true)
     try {
-      console.log('Attempting to create user...');
-      await signup(values.email, values.password, values.role, values.name);
-      
-      const user = await login(values.email, values.password);
-      console.log('User created and logged in successfully:', user);
-
-      toast({
-        title: "Account created successfully",
-        description: "Welcome to Fox In The Truck Management!",
+      const {error} = await supabase.auth.signUp({
+        email: values.email,
+        password: values.password,
       });
-
-      // Redirect based on user role
-      if (user.role === 'client') {
-        router.push('/dashboard/client');
-      } else if (user.role === 'contractor') {
-        router.push('/dashboard/contractor');
-      } else {
-        throw new Error('Invalid user role');
-      }
+      if (error) throw error;
+      toast({
+        title: "Check your email",
+        description: "We sent you an email with a link to confirm your email address.",
+      })
     } catch (error) {
-      console.error('Signup failed:', error);
-
       toast({
         variant: "destructive",
-        title: "Signup failed",
-        description: error instanceof Error ? error.message : "There was an error creating your account. Please try again.",
-      });
-      console.log('Toast notification shown for error.');
+        title: "Sign up failed",
+        description: "Please check your credentials and try again.",
+      })
     } finally {
-      setIsLoading(false);
-      console.log('Signup process completed.');
+      setIsLoading(false)
     }
   }
-  
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={form.handleSubmit(onSignUp)} className="space-y-4">
         <FormField
           control={form.control}
           name="email"
@@ -153,4 +126,3 @@ export function SignupForm() {
     </Form>
   )
 }
-
