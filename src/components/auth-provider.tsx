@@ -6,14 +6,11 @@ import { signIn, signOut, useSession } from 'next-auth/react'
 import { getXataClient } from '@/xata';
 import { drizzle } from 'drizzle-orm/xata-http';
 import { usersTable } from '@/db/schema';
+import type { InferSelectModel } from 'drizzle-orm';
 import { hash } from 'bcryptjs';
 import { eq } from 'drizzle-orm';
 
-type User = {
-  id: string
-  email: string
-  role: 'client' | 'contractor'
-}
+type User = InferSelectModel<typeof usersTable>;
 
 type AuthContextType = {
   user: User | null
@@ -119,11 +116,11 @@ export function AuthProvider({
     try {
       console.log('Starting signup process...');
       const xata = getXataClient();
-      const db = drizzle(xata);
+      const db = drizzle(xata, { schema: { usersTable } });
       
       // Check if user already exists
       const existingUser = await db.query.usersTable.findFirst({
-        where: (users: { email: any; }, { eq }: any) => eq(users.email, email),
+        where: (users, { eq }) => eq(users.email, email),
       });
 
       if (existingUser) {
