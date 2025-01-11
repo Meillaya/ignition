@@ -51,20 +51,30 @@ export function SignupForm() {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
+    console.log('Form submitted with values:', values);
+
     try {
+      console.log('Attempting to create user...');
       await signup(values.email, values.password, values.role, values.name, values.age);
+      console.log('User creation successful!');
+
       toast({
         title: "Account created successfully",
         description: "Welcome to Fox In The Truck Management!",
       });
+      console.log('Toast notification shown for success.');
     } catch (error) {
+      console.error('Signup failed:', error);
+
       toast({
         variant: "destructive",
         title: "Signup failed",
         description: error instanceof Error ? error.message : "There was an error creating your account. Please try again.",
       });
+      console.log('Toast notification shown for error.');
     } finally {
       setIsLoading(false);
+      console.log('Signup process completed.');
     }
   }
 

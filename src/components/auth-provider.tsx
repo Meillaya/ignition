@@ -50,39 +50,54 @@ export function AuthProvider({
 
   useEffect(() => {
     const checkSession = async () => {
-      if (status === 'authenticated' && session?.user) {
-        setUser({
-          id: session.user.id as string,
-          email: session.user.email as string,
-          role: session.user.role as 'client' | 'contractor'
-        });
-      } else if (status === 'unauthenticated') {
-        setUser(null);
+      try {
+        console.log('Checking session status:', status);
+        if (status === 'authenticated' && session?.user) {
+          console.log('User authenticated:', session.user);
+          setUser({
+            id: session.user.id as string,
+            email: session.user.email as string,
+            role: session.user.role as 'client' | 'contractor'
+          });
+        } else if (status === 'unauthenticated') {
+          console.log('No active session.');
+          setUser(null);
+        }
+        setIsInitialized(true);
+        console.log('Auth provider initialized.');
+      } catch (error) {
+        console.error('Session check error:', error);
+        setIsInitialized(true);
       }
-      setIsInitialized(true);
     };
 
     checkSession();
   }, [session, status]);
 
   const login = async (email: string, password: string): Promise<User> => {
+    console.log('Attempting to log in user:', email);
     const result = await signIn('credentials', {
       email,
       password,
       redirect: false,
-    })
+    });
 
     if (result?.error) {
-      throw new Error(result.error)
+      console.error('Login failed:', result.error);
+      throw new Error(result.error);
     }
+    console.log('Login successful.');
 
     // Wait for session to update
+    console.log('Waiting for session to update...');
     await new Promise(resolve => setTimeout(resolve, 100));
 
     if (!session?.user) {
+      console.error('Login failed - no session created.');
       throw new Error('Login failed - no session created');
     }
 
+    console.log('Session updated successfully:', session.user);
     return {
       id: session.user.id as string,
       email: session.user.email as string,
@@ -91,9 +106,11 @@ export function AuthProvider({
   }
 
   const logout = async () => {
-    await signOut({ redirect: false })
-    setUser(null)
-    router.push('/')
+    console.log('Attempting to log out user...');
+    await signOut({ redirect: false });
+    setUser(null);
+    console.log('User logged out successfully.');
+    router.push('/');
   }
 
   const signup = async (
@@ -104,22 +121,31 @@ export function AuthProvider({
     age?: number
   ) => {
     try {
+      console.log('Starting signup process...');
       const xata = getXataClient();
       const db = drizzle(xata);
+      console.log('Xata client and drizzle initialized.');
       
       // Check if user already exists
+      console.log('Checking for existing user with email:', email);
       const existingUser = await db.select()
         .from(usersTable)
         .where(eq(usersTable.email, email))
         .limit(1);
 
       if (existingUser.length > 0) {
+        console.error('User already exists:', existingUser);
         throw new Error('User already exists');
       }
+      console.log('No existing user found.');
 
+      // Hash password
+      console.log('Hashing password...');
       const hashedPassword = await hash(password, 12);
+      console.log('Password hashed successfully.');
 
       // Create user in database
+      console.log('Creating user in database...');
       const [newUser] = await db.insert(usersTable).values({
         name: name || email.split('@')[0],
         age: age || 0,
@@ -129,10 +155,13 @@ export function AuthProvider({
       }).returning();
 
       if (!newUser) {
+        console.error('Failed to create user in database');
         throw new Error('Failed to create user');
       }
+      console.log('User created successfully:', newUser);
 
       // Automatically log in the new user
+      console.log('Attempting to log in new user...');
       const result = await signIn('credentials', {
         email,
         password,
@@ -143,11 +172,14 @@ export function AuthProvider({
         console.error('SignIn Error:', result.error);
         throw new Error(result.error);
       }
+      console.log('User login successful.');
 
       // Wait for session to update
+      console.log('Waiting for session to update...');
       await new Promise(resolve => setTimeout(resolve, 500));
 
       // Redirect based on role
+      console.log('Redirecting user based on role:', role);
       if (role === 'client') {
         router.push('/dashboard/client');
       } else {
