@@ -92,12 +92,20 @@ export function AuthProvider({
       throw new Error('Login failed - no session created');
     }
 
-    console.log('Session updated successfully:', session.user);
-    return {
-      id: Number(session.user.id),
-      email: session.user.email as string,
-      role: session.user.role as 'client' | 'contractor'
+    // Fetch user from database to get proper ID type
+    const xata = getXataClient();
+    const db = drizzle(xata, { schema: { usersTable } });
+    
+    const dbUser = await db.query.usersTable.findFirst({
+      where: (users, { eq }) => eq(users.email, email),
+    });
+
+    if (!dbUser) {
+      throw new Error('User not found in database');
     }
+
+    console.log('Session updated successfully:', dbUser);
+    return dbUser;
   }
 
   const logout = async () => {
@@ -112,7 +120,7 @@ export function AuthProvider({
     email: string, 
     password: string, 
     role: 'client' | 'contractor'
-  ) => {
+  ): Promise<User> => {
     try {
       console.log('Starting signup process...');
       const xata = getXataClient();
@@ -159,13 +167,8 @@ export function AuthProvider({
       console.log('Waiting for session to update...');
       await new Promise(resolve => setTimeout(resolve, 500));
 
-      // Redirect based on role
-      console.log('Redirecting user based on role:', role);
-      if (role === 'client') {
-        router.push('/dashboard/client');
-      } else {
-        router.push('/dashboard/contractor');
-      }
+      // Return the created user
+      return newUser;
     } catch (error) {
       console.error('Signup Error:', error);
       throw error;
