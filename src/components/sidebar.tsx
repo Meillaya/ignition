@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Home, Package, Truck, FileText, Settings, LogOut, DollarSign } from 'lucide-react'
-import { useAuth } from '@/components/auth-provider'
+
 import Image from 'next/image';
 
 const getRoutes = (role: 'client' | 'contractor') => {
