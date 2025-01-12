@@ -71,7 +71,7 @@ export function LoginForm() {
 
       toast({
         title: "Logged in successfully",
-        description: "Welcome back to EcoWaste Management!",
+        description: "Welcome back to Fox In The Truck!",
       });
 
       // Redirect to dashboard - NextAuth.js will handle the role-based redirect
