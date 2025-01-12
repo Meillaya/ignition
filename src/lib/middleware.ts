@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 import { cookies } from 'next/headers';
 
 export async function middleware(request: Request) {
-  const token = cookies().get('token')?.value;
+  const token = (await cookies()).get('token')?.value;
 
   if (!token) {
     return NextResponse.redirect(new URL('/login', request.url));

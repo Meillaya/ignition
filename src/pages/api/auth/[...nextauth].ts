@@ -99,8 +99,6 @@ export default NextAuth({
             id: user.id.toString(),
             email: user.email, 
             role: validRole,
-            name: user.name,
-            age: user.age
           };
         } catch (error) {
           console.error('Authorization error:', error);

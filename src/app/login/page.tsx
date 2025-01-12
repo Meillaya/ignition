@@ -1,10 +1,10 @@
-import { Metadata } from 'next'
+import  Metadata  from "next"
 import Link from 'next/link'
 import Image from 'next/image'
 import { LoginForm } from '@/components/login-form'
 import { Button } from '@/components/ui/button'
 import { ArrowLeft } from 'lucide-react'
-import { AuthProvider } from '@/components/auth-provider'
+
 
 export const metadata: Metadata = {
   title: 'Login - Fox In The Truck',
@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 
 export default function LoginPage() {
   return (
-    <AuthProvider>
+
       <div className="flex min-h-screen">
         {/* Left side - Beautiful design */}
         <div className="hidden w-1/2 lg:block relative overflow-hidden">
@@ -87,7 +87,6 @@ export default function LoginPage() {
           </div>
         </div>
       </div>
-    </AuthProvider>
   )
 }
 
