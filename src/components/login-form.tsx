@@ -59,15 +59,13 @@ export function LoginForm() {
         throw new Error(errorData.error || 'Login failed');
       }
 
-      const result = await signIn('credentials', {
+      // Redirect to dashboard - NextAuth will handle the session creation
+      await signIn('credentials', {
         email: values.email,
         password: values.password,
-        redirect: false,
+        redirect: true,
+        callbackUrl: '/dashboard'
       });
-
-      if (result?.error) {
-        throw new Error(result.error);
-      }
 
       toast({
         title: "Logged in successfully",

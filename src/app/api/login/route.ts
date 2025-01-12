@@ -41,28 +41,10 @@ export async function POST(request: Request) {
       );
     }
 
-    // Create NextAuth session
-    const result = await signIn('credentials', {
-      redirect: false,
-      email,
-      password,
-      callbackUrl: '/dashboard'
-    });
-
-    if (!result?.ok) {
-      return NextResponse.json(
-        { error: 'Authentication failed' },
-        { status: 401 }
-      );
-    }
-
+    // Return success - NextAuth will handle session creation
     return NextResponse.json({ 
       success: true,
-      user: {
-        id: user.id,
-        email: user.email,
-        role: user.role
-      }
+      redirectUrl: '/dashboard'
     });
   } catch (error) {
     console.error('Login error:', error);
