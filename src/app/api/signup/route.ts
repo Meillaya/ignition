@@ -37,7 +37,6 @@ export async function POST(request: Request) {
 
     // Create user
     const [newUser] = await db.insert(usersTable).values({
-      id: crypto.randomUUID(),
       email,
       password: hashedPassword,
       role,
