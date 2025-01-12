@@ -1,7 +1,9 @@
-import { pgTable, serial, varchar, timestamp,  } from "drizzle-orm/pg-core";
-import { rolesEnum } from "./enums";
+import { pgTable, serial, varchar, timestamp, pgEnum  } from "drizzle-orm/pg-core";
+
 import * as t from "drizzle-orm/pg-core";
 import { relations } from 'drizzle-orm';
+
+export const rolesEnum = pgEnum("role", ["client", "contractor"]);
 
 export const usersTable = pgTable("users", {
   id: t.integer().primaryKey().generatedAlwaysAsIdentity(),
