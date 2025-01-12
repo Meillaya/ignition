@@ -1,14 +1,14 @@
 "use client"
 
-
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Home, Package, Truck, FileText, Settings, LogOut, DollarSign } from 'lucide-react'
-
-import Image from 'next/image';
+import { signOut } from 'next-auth/react'
+import { useSession } from 'next-auth/react'
+import Image from 'next/image'
 
 const getRoutes = (role: 'client' | 'contractor') => {
   const commonRoutes = [
@@ -34,9 +34,15 @@ const getRoutes = (role: 'client' | 'contractor') => {
 
 export function Sidebar() {
   const pathname = usePathname()
-  const { user } = useAuth()
+  const { data: session } = useSession()
+  const router = useRouter()
 
-  const routes = getRoutes(user?.role || 'client')
+  const handleLogout = async () => {
+    await signOut({ redirect: false })
+    router.push('/login')
+  }
+
+  const routes = getRoutes(session?.user?.role || 'client')
 
   return (
     <div className="flex h-full w-64 flex-col border-r bg-background">
@@ -68,7 +74,11 @@ export function Sidebar() {
         </nav>
       </ScrollArea>
       <div className="border-t p-4">
-        <Button variant="outline" className="w-full justify-start">
+        <Button 
+          variant="outline" 
+          className="w-full justify-start"
+          onClick={handleLogout}
+        >
           <LogOut className="mr-2 h-4 w-4" />
           Log out
         </Button>
