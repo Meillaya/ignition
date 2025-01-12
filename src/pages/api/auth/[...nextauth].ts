@@ -1,4 +1,5 @@
 import NextAuth from 'next-auth';
+import crypto from 'crypto';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import { getXataClient } from '@/xata';
 import { drizzle } from 'drizzle-orm/xata-http';
@@ -45,6 +46,25 @@ export default NextAuth({
   cookies: {
     sessionToken: {
       name: `__Secure-next-auth.session-token`,
+      options: {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        secure: process.env.NODE_ENV === 'production',
+        domain: process.env.NEXTAUTH_URL?.replace(/https?:\/\//, ''),
+      },
+    },
+    callbackUrl: {
+      name: `__Secure-next-auth.callback-url`,
+      options: {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        secure: process.env.NODE_ENV === 'production',
+      },
+    },
+    csrfToken: {
+      name: `__Host-next-auth.csrf-token`,
       options: {
         httpOnly: true,
         sameSite: 'lax',
@@ -111,7 +131,11 @@ export default NextAuth({
     strategy: 'jwt',
     maxAge: 30 * 24 * 60 * 60, // 30 days
     updateAge: 24 * 60 * 60, // 24 hours
+    generateSessionToken: () => {
+      return crypto.randomBytes(32).toString('hex');
+    },
   },
+  useSecureCookies: process.env.NODE_ENV === 'production',
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
