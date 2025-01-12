@@ -59,21 +59,17 @@ export function LoginForm() {
         throw new Error(errorData.error || 'Login failed');
       }
 
-      // Redirect to dashboard - NextAuth will handle the session creation
-      await signIn('credentials', {
+      // Use signIn with redirect: true to let NextAuth handle everything
+      const result = await signIn('credentials', {
+        redirect: true,
         email: values.email,
         password: values.password,
-        redirect: true,
         callbackUrl: '/dashboard'
       });
 
-      toast({
-        title: "Logged in successfully",
-        description: "Welcome back to Fox In The Truck!",
-      });
-
-      // Redirect to dashboard - NextAuth.js will handle the role-based redirect
-      router.push('/dashboard');
+      if (result?.error) {
+        throw new Error(result.error);
+      }
     } catch (error) {
       toast({
         variant: "destructive",

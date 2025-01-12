@@ -41,10 +41,9 @@ export async function POST(request: Request) {
       );
     }
 
-    // Return success - NextAuth will handle session creation
+    // Return minimal response - NextAuth will handle the rest
     return NextResponse.json({ 
-      success: true,
-      redirectUrl: '/dashboard'
+      success: true
     });
   } catch (error) {
     console.error('Login error:', error);
