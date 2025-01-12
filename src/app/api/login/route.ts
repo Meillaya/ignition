@@ -5,6 +5,7 @@ import { usersTable } from '@/db/schema';
 import { compare } from 'bcryptjs';
 import { eq } from 'drizzle-orm';
 import { z } from 'zod';
+import { signIn } from 'next-auth/react';
 
 const loginSchema = z.object({
   email: z.string().email(),
@@ -26,8 +27,8 @@ export async function POST(request: Request) {
 
     if (!user) {
       return NextResponse.json(
-        { error: 'User not found' },
-        { status: 404 }
+        { error: 'Invalid email or password' },
+        { status: 401 }
       );
     }
 
@@ -35,12 +36,34 @@ export async function POST(request: Request) {
     const passwordMatch = await compare(password, user.password);
     if (!passwordMatch) {
       return NextResponse.json(
-        { error: 'Invalid password' },
+        { error: 'Invalid email or password' },
         { status: 401 }
       );
     }
 
-    return NextResponse.json({ success: true, user });
+    // Create NextAuth session
+    const result = await signIn('credentials', {
+      redirect: false,
+      email,
+      password,
+      callbackUrl: '/dashboard'
+    });
+
+    if (!result?.ok) {
+      return NextResponse.json(
+        { error: 'Authentication failed' },
+        { status: 401 }
+      );
+    }
+
+    return NextResponse.json({ 
+      success: true,
+      user: {
+        id: user.id,
+        email: user.email,
+        role: user.role
+      }
+    });
   } catch (error) {
     console.error('Login error:', error);
     return NextResponse.json(
