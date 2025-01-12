@@ -46,20 +46,6 @@ export function LoginForm() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
     try {
-      const response = await fetch('/api/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(values),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Login failed');
-      }
-
-      // Use signIn with redirect: true to let NextAuth handle everything
       const result = await signIn('credentials', {
         redirect: true,
         email: values.email,
@@ -70,6 +56,11 @@ export function LoginForm() {
       if (result?.error) {
         throw new Error(result.error);
       }
+
+      toast({
+        title: "Logged in successfully",
+        description: "Redirecting to dashboard...",
+      });
     } catch (error) {
       toast({
         variant: "destructive",
