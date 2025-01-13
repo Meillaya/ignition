@@ -17,11 +17,6 @@ import {
 import { Input } from '@/components/ui/input'
 import { useToast } from '@/components/ui/use-toast'
 import { signIn } from 'next-auth/react'
-import { drizzle } from 'drizzle-orm/xata-http'
-import { getXataClient } from '@/xata'
-import { usersTable } from '@/db/schema'
-import { eq } from 'drizzle-orm'
-import { compare } from 'bcryptjs'
 
 
 

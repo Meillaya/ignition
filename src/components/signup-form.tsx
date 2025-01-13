@@ -23,11 +23,7 @@ import {
 } from './ui/select'
 import { signIn } from 'next-auth/react'
 import { useToast } from './ui/use-toast'
-import { drizzle } from 'drizzle-orm/xata-http';
-import { getXataClient } from '@/xata';
-import { usersTable } from '@/db/schema';
-import { hash } from 'bcryptjs';
-import { eq } from 'drizzle-orm';
+
 
 const formSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
