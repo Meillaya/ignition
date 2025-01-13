@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from 'react'
-import  Metadata  from 'next'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -24,10 +23,6 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Calendar, MapPin, MoreHorizontal, Search, Truck } from 'lucide-react'
 
-export const metadata: Metadata = {
-  title: 'My Jobs - Fox In The Truck',
-  description: 'View and manage your current waste collection jobs',
-}
 
 interface Job {
   id: string
