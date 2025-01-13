@@ -74,9 +74,8 @@ export function SignupForm() {
         throw new Error(result.error);
       }
 
-      // Redirect based on role
-      const redirectUrl = values.role === 'client' ? '/dashboard/client' : '/dashboard/contractor';
-      router.push(redirectUrl);
+      // Redirect to unified dashboard
+      router.push('/dashboard');
 
       toast({
         title: "Account created successfully",

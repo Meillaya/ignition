@@ -18,7 +18,7 @@ export default async function SignupPage() {
   const session: Session | null = await getServerSession(authOptions);
   
   if (session && session.user) {
-    redirect(session.user.role === 'client' ? '/dashboard/client' : '/dashboard/contractor');
+    redirect('/dashboard');
   }
   return (
    

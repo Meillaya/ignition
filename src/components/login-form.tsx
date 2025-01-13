@@ -51,16 +51,8 @@ export function LoginForm() {
         throw new Error(result.error);
       }
 
-      // Fetch user role after successful login
-      const userResponse = await fetch('/api/login');
-      if (!userResponse.ok) {
-        throw new Error('Failed to fetch user data');
-      }
-
-      const { user } = await userResponse.json();
-      const redirectUrl = user.role === 'client' ? '/dashboard/client' : '/dashboard/contractor';
-
-      router.push(redirectUrl);
+      // Redirect to unified dashboard
+      router.push('/dashboard');
       toast({
         title: "Logged in successfully",
         description: "Redirecting to your dashboard...",

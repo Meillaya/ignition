@@ -22,8 +22,7 @@ export default async function LoginPage({
   const session: Session | null = await getServerSession(authOptions);
   
   if (session && session.user) {
-    const redirectUrl = searchParams.callbackUrl || 
-      (session.user.role === 'client' ? '/dashboard/client' : '/dashboard/contractor');
+    const redirectUrl = searchParams.callbackUrl || '/dashboard';
     redirect(redirectUrl);
   }
   return (
