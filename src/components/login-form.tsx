@@ -44,7 +44,7 @@ export function LoginForm() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
     try {
-      // First try authenticating with NextAuth credentials
+      // Authenticate with NextAuth credentials
       const result = await signIn('credentials', {
         redirect: false,
         email: values.email,
@@ -52,43 +52,7 @@ export function LoginForm() {
       });
 
       if (result?.error) {
-        // If NextAuth fails, try Supabase auth as fallback
-        const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-          email: values.email,
-          password: values.password,
-        });
-
-        if (authError) {
-          throw new Error(authError.message);
-        }
-
-        if (!authData.user) {
-          throw new Error('User not found');
-        }
-
-        // Get additional user data from users table
-        const { data: userData, error: userError } = await supabase
-          .from('users')
-          .select('*')
-          .eq('id', authData.user.id)
-          .single();
-
-        if (userError || !userData) {
-          throw new Error('User data not found');
-        }
-
-        // Create session with NextAuth using Supabase credentials
-        const nextAuthResult = await signIn('credentials', {
-          redirect: false,
-          email: values.email,
-          password: values.password,
-          id: authData.user.id,
-          role: userData.role,
-        });
-
-        if (nextAuthResult?.error) {
-          throw new Error(nextAuthResult.error);
-        }
+        throw new Error(result.error);
       }
 
       if (result?.error) {
