@@ -22,5 +22,12 @@ export interface WizardContextType {
   nextStep: () => void;
   prevStep: () => void;
   goToStep: (step: number) => void;
+  calculateTotalCost: () => number;
+}
+
+export interface PricingInfo {
+  basePrices: Record<BinSize, number>;
+  wasteTypeMultipliers: Record<WasteType, number>;
+  placementFees: Record<BinPlacement, number>;
 }
 

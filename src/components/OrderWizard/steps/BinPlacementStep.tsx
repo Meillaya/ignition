@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import { Card, CardContent } from '@/components/ui/card'
 import { useWizard } from '../OrderWizard'
 import { BinPlacement } from '@/types/wizard'
+import { MapPin, AlertTriangle } from 'lucide-react'
 
 const placementOptions: { value: BinPlacement; label: string; description: string; fee: number }[] = [
   {
@@ -29,39 +30,47 @@ const BinPlacementStep: React.FC = () => {
   const { orderDetails, updateOrderDetails } = useWizard()
 
   return (
-    <div>
-      <h2 className="text-2xl font-bold mb-4">Select Bin Placement</h2>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div className="space-y-6">
+      <p className="text-gray-600 dark:text-gray-300">
+        Choose where you'd like the bin to be placed on your property. Please ensure there's clear access to the chosen area.
+      </p>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {placementOptions.map((option) => (
           <motion.div
             key={option.value}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.98 }}
           >
             <Card
-              className={`cursor-pointer transition-colors ${
+              className={`cursor-pointer transition-all duration-200 ${
                 orderDetails.binPlacement === option.value
-                  ? 'border-primary'
-                  : 'border-border hover:border-primary'
+                  ? 'ring-2 ring-orange-500 dark:ring-orange-400'
+                  : 'hover:shadow-md'
               }`}
               onClick={() => updateOrderDetails({ binPlacement: option.value })}
             >
-              <CardContent className="p-4">
-                <h3 className="font-semibold mb-2">{option.label}</h3>
-                <p className="text-sm text-muted-foreground mb-2">{option.description}</p>
+              <CardContent className="p-6">
+                <div className="flex items-center mb-4">
+                  <MapPin className="mr-2 h-5 w-5 text-orange-500 dark:text-orange-400" />
+                  <h3 className="font-semibold text-lg">{option.label}</h3>
+                </div>
+                <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">{option.description}</p>
                 {option.fee > 0 && (
-                  <p className="text-sm font-bold text-red-500">
-                    Additional fee: ${option.fee}
-                  </p>
+                  <div className="flex items-center text-orange-600 dark:text-orange-400">
+                    <AlertTriangle className="mr-2 h-4 w-4" />
+                    <p className="text-sm font-semibold">
+                      Additional fee: ${option.fee}
+                    </p>
+                  </div>
                 )}
               </CardContent>
             </Card>
           </motion.div>
         ))}
       </div>
-      <p className="mt-4 text-sm text-muted-foreground">
-        Note: Placing the bin on the lawn incurs an additional fee. Please ensure
-        there's clear access to the chosen placement area.
+      <p className="mt-4 text-sm text-gray-500 dark:text-gray-400 flex items-center">
+        <AlertTriangle className="mr-2 h-4 w-4" />
+        Note: Placing the bin on the lawn incurs an additional fee. Please ensure there's clear access to the chosen placement area.
       </p>
     </div>
   )

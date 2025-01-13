@@ -54,25 +54,27 @@ const WasteTypeStep: React.FC = () => {
   const { orderDetails, updateOrderDetails } = useWizard()
 
   return (
-    <div>
-      <h2 className="text-2xl font-bold mb-4">Select Waste Type</h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div className="space-y-6">
+      <p className="text-gray-600 dark:text-gray-300">
+        Select the type of waste you need to dispose of. This helps us determine the best handling method and pricing.
+      </p>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {wasteTypes.map((waste) => (
           <motion.div
             key={waste.type}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.98 }}
           >
             <Card
-              className={`cursor-pointer transition-colors ${
+              className={`cursor-pointer transition-all duration-200 ${
                 orderDetails.wasteType === waste.type
-                  ? 'border-primary'
-                  : 'border-border hover:border-primary'
+                  ? 'ring-2 ring-orange-500 dark:ring-orange-400'
+                  : 'hover:shadow-md'
               }`}
               onClick={() => updateOrderDetails({ wasteType: waste.type })}
             >
-              <CardContent className="p-4">
-                <div className="relative h-40 mb-4">
+              <CardContent className="p-0">
+                <div className="relative h-48">
                   <Image
                     src={waste.image}
                     alt={waste.label}
@@ -80,9 +82,14 @@ const WasteTypeStep: React.FC = () => {
                     objectFit="cover"
                     className="rounded-t-lg"
                   />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                  <h3 className="absolute bottom-2 left-3 text-white font-semibold text-lg">
+                    {waste.label}
+                  </h3>
                 </div>
-                <h3 className="font-semibold mb-2">{waste.label}</h3>
-                <p className="text-sm text-muted-foreground">{waste.description}</p>
+                <div className="p-4">
+                  <p className="text-sm text-gray-600 dark:text-gray-300">{waste.description}</p>
+                </div>
               </CardContent>
             </Card>
           </motion.div>

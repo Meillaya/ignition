@@ -46,11 +46,6 @@ const getRoutes = (role: 'client' | 'contractor') => {
       href: '/dashboard/order-history', 
       icon: ClipboardList 
     },
-    { 
-      name: 'Scheduled Pickups', 
-      href: '/dashboard/schedule', 
-      icon: CalendarCheck 
-    },
   ]
 
   const contractorRoutes = [

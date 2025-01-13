@@ -19,7 +19,7 @@ import { Input } from '@/components/ui/input'
 import { useToast } from '@/components/ui/use-toast'
 import { signIn } from 'next-auth/react'
 import { supabase } from '@/lib/supabaseClient'
-import Image from 'next/image'
+
 
 
 const formSchema = z.object({
@@ -125,10 +125,18 @@ export function LoginForm() {
             </FormItem>
           )}
         />
-
-
+        
+        <Button type="submit" className="w-full" disabled={isLoading}>
+          {isLoading ? (
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              <span>Logging in...</span>
+            </div>
+          ) : (
+            "Log in"
+          )}
+        </Button>
       </form>
-      
     </Form>
   )
 }
