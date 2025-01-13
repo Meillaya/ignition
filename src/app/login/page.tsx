@@ -19,7 +19,10 @@ export default async function LoginPage() {
   const session = await getServerSession(authOptions)
   
   if (session) {
-    redirect(session.user.role === 'client' ? '/dashboard/client' : '/dashboard/contractor')
+    const searchParams = new URLSearchParams(searchParamsString || '');
+    const callbackUrl = searchParams.get('callbackUrl') || 
+      (session.user.role === 'client' ? '/dashboard/client' : '/dashboard/contractor');
+    redirect(callbackUrl);
   }
   return (
 

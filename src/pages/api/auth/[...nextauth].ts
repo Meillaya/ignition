@@ -144,11 +144,22 @@ export default NextAuth({
       return session;
     },
     async redirect({ url, baseUrl }) {
-      // Allows relative callback URLs
-      if (url.startsWith("/")) return `${baseUrl}${url}`
-      // Allows callback URLs on the same origin
-      else if (new URL(url).origin === baseUrl) return url
-      return baseUrl
+      // Handle callback URLs
+      if (url.startsWith('/')) {
+        // Allow relative callback URLs
+        return `${baseUrl}${url}`;
+      } else if (new URL(url).origin === baseUrl) {
+        // Allow callback URLs on the same origin
+        return url;
+      }
+      
+      // Redirect to dashboard based on user role
+      const session = await getSession();
+      if (session?.user?.role) {
+        return `${baseUrl}/dashboard/${session.user.role}`;
+      }
+      
+      return baseUrl;
     }
   }
 });

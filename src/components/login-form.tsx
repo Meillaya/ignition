@@ -45,8 +45,19 @@ export function LoginForm() {
         redirect: false,
         email: values.email,
         password: values.password,
-        callbackUrl: '/dashboard'
+        callbackUrl: '/dashboard' // This will be handled by NextAuth
       });
+
+      if (result?.error) {
+        throw new Error(result.error);
+      }
+
+      // Get the callback URL from the query parameters
+      const searchParams = new URLSearchParams(window.location.search);
+      const callbackUrl = searchParams.get('callbackUrl') || '/dashboard';
+      
+      // Redirect to the appropriate dashboard based on role
+      router.push(callbackUrl);
 
       if (result?.error) {
         throw new Error(result.error);
