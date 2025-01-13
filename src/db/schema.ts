@@ -64,7 +64,10 @@ export const usersTable = pgTable("users", {
   role: rolesEnum("role").notNull(),
   created_at: timestamp("created_at").defaultNow(),
   updated_at: timestamp("updated_at").defaultNow(),
-});
+}, (table) => ({
+  emailIdx: uniqueIndex("email_idx").on(table.email),
+  roleIdx: index("role_idx").on(table.role),
+}));
 
 
 
@@ -97,7 +100,12 @@ export const userProfilesTable = pgTable("user_profiles", {
   totalJobsCompleted: integer("total_jobs_completed").default(0),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
-});
+}, (table) => ({
+  statusIdx: index("status_idx").on(table.status),
+  scheduledDateIdx: index("scheduled_date_idx").on(table.scheduledDate),
+  paymentStatusIdx: index("payment_status_idx").on(table.paymentStatus),
+  userIdIdx: index("user_id_idx").on(table.userId),
+}));
 
 export const ordersTable = pgTable("orders", {
   id: varchar("id", { length: 255 }).primaryKey().$defaultFn(() => crypto.randomUUID()),
@@ -118,7 +126,10 @@ export const ordersTable = pgTable("orders", {
   lastUpdated: timestamp("last_updated").defaultNow(),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
-});
+}, (table) => ({
+  contractorStatusIdx: index("contractor_status_idx").on(table.contractorStatus),
+  userIdIdx: uniqueIndex("user_id_idx").on(table.userId),
+}));
 
 export const wasteTypesTable = pgTable("waste_types", {
   id: varchar("id", { length: 255 }).primaryKey().$defaultFn(() => crypto.randomUUID()),
@@ -127,7 +138,11 @@ export const wasteTypesTable = pgTable("waste_types", {
   priceMultiplier: decimal("price_multiplier", { precision: 5, scale: 2 }).notNull(),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
-});
+}, (table) => ({
+  statusIdx: index("status_idx").on(table.status),
+  orderIdIdx: index("order_id_idx").on(table.orderId),
+  contractorIdIdx: index("contractor_id_idx").on(table.contractorId),
+}));
 
 export const binSizesTable = pgTable("bin_sizes", {
   id: varchar("id", { length: 255 }).primaryKey().$defaultFn(() => crypto.randomUUID()),
