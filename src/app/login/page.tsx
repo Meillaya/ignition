@@ -81,7 +81,7 @@ export default async function LoginPage({
             </Button>
 
             <div className="space-y-2 text-center">
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Sign In to Fox In The Truck</h1>
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Sign In</h1>
               <p className="text-gray-600 dark:text-gray-400">
                 Enter your credentials to access your account
               </p>

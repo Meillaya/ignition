@@ -38,12 +38,12 @@ const getRoutes = (role: 'client' | 'contractor') => {
   const clientRoutes = [
     { 
       name: 'New Order', 
-      href: '/dashboard/orders/new', 
+      href: '/dashboard/new-order', 
       icon: Package 
     },
     { 
       name: 'My Orders', 
-      href: '/dashboard/orders', 
+      href: '/dashboard/order-history', 
       icon: ClipboardList 
     },
     { 
