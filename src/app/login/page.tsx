@@ -3,10 +3,11 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { LoginForm } from '@/components/login-form'
 import { getServerSession } from 'next-auth'
-import { authOptions } from '@/pages/api/auth/[...nextauth]'
+import authOptions from "@/pages/api/auth/[...nextauth]"
 import { redirect } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { ArrowLeft } from 'lucide-react'
+import {Session} from 'next-auth'
 
 
 export const metadata: Metadata = {
