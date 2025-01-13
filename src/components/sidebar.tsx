@@ -51,12 +51,12 @@ const getRoutes = (role: 'client' | 'contractor') => {
   const contractorRoutes = [
     { 
       name: 'Available Jobs', 
-      href: '/dashboard/jobs', 
+      href: '/dashboard/job-board', 
       icon: Briefcase 
     },
     { 
       name: 'My Jobs', 
-      href: '/dashboard/jobs/my', 
+      href: '/dashboard/my-jobs', 
       icon: Truck 
     },
     { 
