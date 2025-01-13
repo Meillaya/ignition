@@ -85,43 +85,33 @@ export default NextAuth({
             return null;
           }
 
-          // First validate email exists
-          const { data: user, error: userError } = await supabase
+          // Use Supabase auth to verify credentials
+          const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+            email: credentials.email,
+            password: credentials.password,
+          });
+
+          if (authError || !authData.user) {
+            console.error('Authentication failed:', credentials.email);
+            throw new Error("Invalid email or password");
+          }
+
+          // Get additional user data from users table
+          const { data: userData, error: userError } = await supabase
             .from('users')
             .select('*')
-            .eq('email', credentials.email)
+            .eq('id', authData.user.id)
             .single();
 
-          if (userError || !user) {
-            console.error('User not found:', credentials.email);
-            throw new Error("Invalid email or password");
+          if (userError || !userData) {
+            console.error('User data not found:', authData.user.id);
+            throw new Error("User data not found");
           }
 
-          // Then validate password
-          const { data: authData, error: authError } = await supabase
-            .from('users')
-            .select('password')
-            .eq('email', credentials.email)
-            .single();
-
-          if (authError || !authData?.password) {
-            console.error('Password validation failed:', user.id);
-            throw new Error("Invalid email or password");
-          }
-
-          const isValid = await compare(credentials.password, authData.password);
-          if (!isValid) {
-            console.error('Invalid password for user:', user.id);
-            throw new Error("Invalid email or password");
-          }
-
-          // Type assertion is safe here because we've already validated the role
-          const validRole = user.role as 'client' | 'contractor';
-
-          return { 
-            id: user.id.toString(),
-            email: user.email, 
-            role: validRole,
+          return {
+            id: authData.user.id,
+            email: authData.user.email,
+            role: userData.role as 'client' | 'contractor',
           };
         } catch (error) {
           console.error('Authorization error:', error);

@@ -42,22 +42,34 @@ export function LoginForm() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
     try {
-      // First validate credentials with Supabase
-      const { data: user, error } = await supabase
-        .from('users')
-        .select('*')
-        .eq('email', values.email)
-        .single();
+      // Use Supabase auth to sign in
+      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+        email: values.email,
+        password: values.password,
+      });
 
-      if (error || !user) {
+      if (authError || !authData.user) {
         throw new Error('Invalid email or password');
       }
 
-      // Then authenticate with NextAuth
+      // Get additional user data from users table
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('*')
+        .eq('id', authData.user.id)
+        .single();
+
+      if (userError || !userData) {
+        throw new Error('User data not found');
+      }
+
+      // Then authenticate with NextAuth using the validated credentials
       const result = await signIn('credentials', {
         redirect: false,
         email: values.email,
         password: values.password,
+        id: authData.user.id,
+        role: userData.role,
       });
 
       if (result?.error) {
