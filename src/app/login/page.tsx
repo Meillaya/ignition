@@ -2,6 +2,9 @@ import  Metadata  from "next"
 import Link from 'next/link'
 import Image from 'next/image'
 import { LoginForm } from '@/components/login-form'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/pages/api/auth/[...nextauth]'
+import { redirect } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { ArrowLeft } from 'lucide-react'
 
@@ -11,7 +14,12 @@ export const metadata: Metadata = {
   description: 'Login to your Fox In The Truck account',
 }
 
-export default function LoginPage() {
+export default async function LoginPage() {
+  const session = await getServerSession(authOptions)
+  
+  if (session) {
+    redirect(session.user.role === 'client' ? '/dashboard/client' : '/dashboard/contractor')
+  }
   return (
 
       <div className="flex min-h-screen">

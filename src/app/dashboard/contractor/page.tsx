@@ -9,7 +9,20 @@ export const metadata: Metadata = {
   description: 'Manage your waste collection jobs',
 }
 
-export default function ContractorDashboard() {
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/pages/api/auth/[...nextauth]'
+import { redirect } from 'next/navigation'
+
+export default async function ContractorDashboard() {
+  const session = await getServerSession(authOptions)
+  
+  if (!session) {
+    redirect('/login')
+  }
+
+  if (session.user.role !== 'contractor') {
+    redirect('/dashboard/client')
+  }
   return (
     <div className="container mx-auto p-6 space-y-8">
       <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Contractor Dashboard</h1>
