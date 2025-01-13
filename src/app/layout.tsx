@@ -10,6 +10,9 @@ const geist = Geist({
 export const metadata: Metadata = {
   title: 'Fox In The Truck- Construction Waste Management',
   description: 'Efficient and sustainable construction waste management solutions',
+  icons: {
+    icon: '/foxinthetruck(192png).png',
+  },
 }
 
 export default function RootLayout({
