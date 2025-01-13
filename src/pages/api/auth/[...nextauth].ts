@@ -5,6 +5,7 @@ import { supabase } from '@/lib/supabaseClient';
 import { compare } from 'bcryptjs';
 import { DefaultSession, Session } from 'next-auth'
 import { JWT } from 'next-auth/jwt'
+import { getSession } from 'next-auth/react';
 
 declare module 'next-auth' {
   interface Session extends DefaultSession {
