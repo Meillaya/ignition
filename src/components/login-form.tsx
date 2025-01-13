@@ -45,18 +45,21 @@ export function LoginForm() {
         redirect: false,
         email: values.email,
         password: values.password,
+        callbackUrl: '/dashboard'
       });
 
       if (result?.error) {
         throw new Error(result.error);
       }
 
-      // Manually redirect after successful login
-      window.location.href = '/dashboard';
+      if (result?.url) {
+        // Redirect to the callback URL
+        router.push(result.url);
+      }
 
       toast({
         title: "Logged in successfully",
-        description: "Redirecting to dashboard...",
+        description: "Redirecting to your dashboard...",
       });
     } catch (error) {
       toast({

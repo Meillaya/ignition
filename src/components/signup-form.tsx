@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
@@ -32,6 +33,7 @@ const formSchema = z.object({
 })
 
 export function SignupForm() {
+  const router = useRouter()
   const { toast } = useToast()
   const [isLoading, setIsLoading] = useState(false)
 
@@ -66,14 +68,21 @@ export function SignupForm() {
         email: values.email,
         password: values.password,
         redirect: false,
+        callbackUrl: values.role === 'client' ? '/dashboard/client' : '/dashboard/contractor'
       });
 
       if (result?.error) {
         throw new Error(result.error);
       }
+
+      if (result?.url) {
+        // Redirect to the appropriate dashboard based on role
+        router.push(result.url);
+      }
+
       toast({
         title: "Account created successfully",
-        description: "You can now log in with your credentials.",
+        description: "Redirecting to your dashboard...",
       });
     } catch (error) {
       console.error('Signup error:', error);
