@@ -2,7 +2,6 @@ import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabaseClient';
 import { hash } from 'bcryptjs';
 import { z } from 'zod';
-import { randomUUID } from 'crypto';
 
 const signupSchema = z.object({
   email: z.string().email(),
@@ -13,7 +12,16 @@ const signupSchema = z.object({
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { email, password, role } = signupSchema.parse(body);
+    // Validate input
+    const validatedData = signupSchema.safeParse(body);
+    if (!validatedData.success) {
+      console.error('Validation error:', validatedData.error);
+      return NextResponse.json(
+        { error: 'Invalid input data', details: validatedData.error.format() },
+        { status: 400 }
+      );
+    }
+    const { email, password, role } = validatedData.data;
 
     // Check if user exists
     const { data: existingUser, error: selectError } = await supabase
@@ -33,10 +41,13 @@ export async function POST(request: Request) {
     const hashedPassword = await hash(password, 12);
 
     // Create user
+    const userId = crypto.randomUUID();
+    console.log('Creating user with ID:', userId);
+    
     const { data: newUser, error: insertError } = await supabase
       .from('users')
       .insert({
-        id: crypto.randomUUID(),
+        id: userId,
         email,
         password: hashedPassword,
         role,
@@ -46,6 +57,11 @@ export async function POST(request: Request) {
       .select()
       .single();
 
+    if (insertError) {
+      console.error('Supabase insert error:', insertError);
+      throw new Error(insertError.message);
+    }
+
     if (!newUser) {
       return NextResponse.json(
         { error: 'Failed to create user' },
@@ -53,6 +69,12 @@ export async function POST(request: Request) {
       );
     }
 
+    if (!newUser) {
+      console.error('No user data returned from insert');
+      throw new Error('User creation failed - no data returned');
+    }
+
+    console.log('User created successfully:', newUser.id);
     return NextResponse.json({ 
       success: true,
       user: {
@@ -60,7 +82,7 @@ export async function POST(request: Request) {
         email: newUser.email,
         role: newUser.role
       }
-    });
+    }, { status: 201 });
   } catch (error) {
     console.error('Signup error:', error);
     return NextResponse.json(
