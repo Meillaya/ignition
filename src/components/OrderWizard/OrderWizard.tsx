@@ -67,21 +67,52 @@ const OrderWizard: React.FC = () => {
   const prevStep = () => setCurrentStep((prev) => Math.max(prev - 1, 1))
   const goToStep = (step: number) => setCurrentStep(step)
 
-  const calculateTotalCost = () => {
-    let total = 0
-    if (orderDetails.binSize) {
-      total += pricingInfo.basePrices[orderDetails.binSize]
-    }
-    if (orderDetails.wasteType) {
-      total *= pricingInfo.wasteTypeMultipliers[orderDetails.wasteType]
-    }
-    if (orderDetails.binPlacement) {
-      total += pricingInfo.placementFees[orderDetails.binPlacement]
-    }
-    return parseFloat(total.toFixed(2))
-  }
+  const [isCalculating, setIsCalculating] = useState(false)
+  const [totalCost, setTotalCost] = useState(0)
+  const [costBreakdown, setCostBreakdown] = useState({
+    basePrice: 0,
+    wasteMultiplier: 1,
+    placementFee: 0
+  })
 
-  const [totalCost, setTotalCost] = useState(calculateTotalCost())
+  const calculateTotalCost = () => {
+    setIsCalculating(true)
+    
+    try {
+      let basePrice = 0
+      let wasteMultiplier = 1
+      let placementFee = 0
+      
+      if (!orderDetails.binSize) {
+        throw new Error('Please select a bin size')
+      }
+      
+      basePrice = pricingInfo.basePrices[orderDetails.binSize]
+      
+      if (orderDetails.wasteType) {
+        wasteMultiplier = pricingInfo.wasteTypeMultipliers[orderDetails.wasteType]
+      }
+      
+      if (orderDetails.binPlacement) {
+        placementFee = pricingInfo.placementFees[orderDetails.binPlacement]
+      }
+      
+      const total = (basePrice * wasteMultiplier) + placementFee
+      
+      setCostBreakdown({
+        basePrice,
+        wasteMultiplier,
+        placementFee
+      })
+      
+      return parseFloat(total.toFixed(2))
+    } catch (error) {
+      console.error('Error calculating cost:', error)
+      return 0
+    } finally {
+      setIsCalculating(false)
+    }
+  }
 
   useEffect(() => {
     setTotalCost(calculateTotalCost())
