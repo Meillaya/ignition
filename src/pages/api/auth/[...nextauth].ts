@@ -124,9 +124,6 @@ export default NextAuth({
     strategy: 'jwt',
     maxAge: 30 * 24 * 60 * 60, // 30 days
     updateAge: 24 * 60 * 60, // 24 hours
-    generateSessionToken: () => {
-      return crypto.randomBytes(32).toString('hex');
-    },
   },
   useSecureCookies: process.env.NODE_ENV === 'production',
   callbacks: {
@@ -145,6 +142,13 @@ export default NextAuth({
         session.user.email = token.email;
       }
       return session;
+    },
+    async redirect({ url, baseUrl }) {
+      // Allows relative callback URLs
+      if (url.startsWith("/")) return `${baseUrl}${url}`
+      // Allows callback URLs on the same origin
+      else if (new URL(url).origin === baseUrl) return url
+      return baseUrl
     }
   }
 });

@@ -51,7 +51,14 @@ export async function POST(request: Request) {
       );
     }
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ 
+      success: true,
+      user: {
+        id: newUser.id,
+        email: newUser.email,
+        role: newUser.role
+      }
+    });
   } catch (error) {
     console.error('Signup error:', error);
     return NextResponse.json(
