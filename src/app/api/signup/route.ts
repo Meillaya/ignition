@@ -40,14 +40,26 @@ export async function POST(request: Request) {
     // Hash password
     const hashedPassword = await hash(password, 12);
 
-    // Create user
-    const userId = crypto.randomUUID();
-    console.log('Creating user with ID:', userId);
-    
+    // First create user in Supabase Auth
+    const { data: authData, error: authError } = await supabase.auth.signUp({
+      email,
+      password,
+    });
+
+    if (authError) {
+      console.error('Supabase auth error:', authError);
+      throw new Error(authError.message);
+    }
+
+    if (!authData.user) {
+      throw new Error('Failed to create user in auth system');
+    }
+
+    // Then create user in users table
     const { data: newUser, error: insertError } = await supabase
       .from('users')
       .insert({
-        id: userId,
+        id: authData.user.id,
         email,
         password: hashedPassword,
         role,
@@ -64,14 +76,9 @@ export async function POST(request: Request) {
 
     if (!newUser) {
       return NextResponse.json(
-        { error: 'Failed to create user' },
+        { error: 'Failed to create user in database' },
         { status: 500 }
       );
-    }
-
-    if (!newUser) {
-      console.error('No user data returned from insert');
-      throw new Error('User creation failed - no data returned');
     }
 
     console.log('User created successfully:', newUser.id);

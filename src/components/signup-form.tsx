@@ -72,11 +72,27 @@ export function SignupForm() {
         throw new Error(errorData.error || 'Signup failed');
       }
 
-      // Automatically log in after signup
+      // Automatically log in after signup using Supabase auth
+      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+        email: values.email,
+        password: values.password,
+      });
+
+      if (authError) {
+        throw new Error(authError.message);
+      }
+
+      if (!authData.user) {
+        throw new Error('Login failed after signup');
+      }
+
+      // Create NextAuth session
       const result = await signIn('credentials', {
         redirect: false,
         email: values.email,
         password: values.password,
+        id: authData.user.id,
+        role: values.role,
       });
 
       if (result?.error) {
@@ -85,6 +101,7 @@ export function SignupForm() {
 
       // Redirect to unified dashboard
       router.push('/dashboard');
+      router.refresh();
 
       toast({
         title: "Account created successfully",
