@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+import type  Metadata  from 'next'
 import { Geist } from 'next/font/google'
 import ClientLayout from './client-layout'
 
@@ -8,7 +8,7 @@ const geist = Geist({
 })
 
 export const metadata: Metadata = {
-  title: 'EcoWaste - Construction Waste Management',
+  title: 'Fox In The Truck- Construction Waste Management',
   description: 'Efficient and sustainable construction waste management solutions',
 }
 
