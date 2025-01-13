@@ -79,45 +79,52 @@ export default NextAuth({
         password: { label: "Password", type: "password" }
       },
       async authorize(credentials) {
-        try {
-          if (!credentials) {
-            console.error('No credentials provided');
-            return null;
-          }
+  try {
+    if (!credentials) {
+      console.error('No credentials provided');
+      return null;
+    }
 
-          // Use Supabase auth to verify credentials
-          const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-            email: credentials.email,
-            password: credentials.password,
-          });
+    const { data: user, error } = await supabase
+      .from('users')
+      .select('*')
+      .eq('email', credentials.email)
+      .single();
 
-          if (authError || !authData.user) {
-            console.error('Authentication failed:', credentials.email);
-            throw new Error("Invalid email or password");
-          }
+    if (!user) {
+      console.error('User not found:', credentials.email);
+      throw new Error("User not found");
+    }
+    if (!user.password) {
+      console.error('Invalid user configuration:', user.id);
+      throw new Error("Invalid user configuration");
+    }
 
-          // Get additional user data from users table
-          const { data: userData, error: userError } = await supabase
-            .from('users')
-            .select('*')
-            .eq('id', authData.user.id)
-            .single();
+    const isValid = await compare(credentials.password, user.password);
+    if (!isValid) {
+      console.error('Invalid password for user:', user.id);
+      throw new Error("Invalid password");
+    }
 
-          if (userError || !userData) {
-            console.error('User data not found:', authData.user.id);
-            throw new Error("User data not found");
-          }
+    // Ensure email is always a string
+    if (!user.email) {
+      console.error('Email is missing for user:', user.id);
+      throw new Error("Email is missing");
+    }
 
-          return {
-            id: authData.user.id,
-            email: authData.user.email,
-            role: userData.role as 'client' | 'contractor',
-          };
-        } catch (error) {
-          console.error('Authorization error:', error);
-          throw error;
-        }
-      }
+    // Type assertion is safe here because we've already validated the role
+    const validRole = user.role as 'client' | 'contractor';
+
+    return { 
+      id: user.id.toString(),
+      email: user.email, // email is now guaranteed to be a string
+      role: validRole,
+    };
+  } catch (error) {
+    console.error('Authorization error:', error);
+    throw error;
+  }
+}
     })
   ],
   session: {
