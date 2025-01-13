@@ -1,10 +1,12 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
-import { authOptions } from '@/pages/api/auth/[...nextauth]';
+import authOptions from "@/pages/api/auth/[...nextauth]";
+import { Session } from 'next-auth'; // Import the Session type
 
 export async function POST() {
-  const session = await getServerSession(authOptions);
-  
+  // Ensure the session is correctly typed using the Session interface
+  const session = await getServerSession(authOptions) as Session | null;
+
   if (!session) {
     return NextResponse.json(
       { error: 'Not authenticated' },
@@ -12,11 +14,14 @@ export async function POST() {
     );
   }
 
+  // Type assertion is not needed here since session is already typed as Session
+  const user = session.user;
+
   return NextResponse.json({ 
     user: {
-      id: session.user.id,
-      email: session.user.email,
-      role: session.user.role
+      id: user.id,
+      email: user.email,
+      role: user.role
     }
   });
 }
