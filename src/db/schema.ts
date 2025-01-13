@@ -2,6 +2,39 @@ import { integer, pgTable, varchar, timestamp, pgEnum, decimal, text } from "dri
 import { relations } from 'drizzle-orm';
 
 export const rolesEnum = pgEnum("role", ["client", "contractor"]);
+
+// Specific waste types
+export const wasteTypeEnum = pgEnum("waste_type", [
+  "mixed_garbage",
+  "asphalt", 
+  "dirt",
+  "mixed_dirt",
+  "brick_and_block",
+  "concrete",
+  "brick_block_concrete"
+]);
+
+// Bin sizes with specific options
+export const binSizeEnum = pgEnum("bin_size", [
+  "6_cubic_yards",
+  "8_cubic_yards", 
+  "10_cubic_yards",
+  "14_cubic_yards"
+]);
+
+// Bin placement options
+export const binPlacementEnum = pgEnum("bin_placement", [
+  "right",
+  "left",
+  "lawn"
+]);
+
+// Contractor status
+export const contractorStatusEnum = pgEnum("contractor_status", [
+  "available",
+  "on_job",
+  "unavailable"
+]);
 // Enums for status fields
 export const orderStatusEnum = pgEnum("order_status", [
   "pending",
@@ -54,6 +87,14 @@ export const userProfilesTable = pgTable("user_profiles", {
   city: varchar("city", { length: 255 }),
   state: varchar("state", { length: 255 }),
   zipCode: varchar("zip_code", { length: 20 }),
+  // Contractor specific fields
+  contractorStatus: contractorStatusEnum("contractor_status"),
+  vehicleType: varchar("vehicle_type", { length: 255 }),
+  licensePlate: varchar("license_plate", { length: 20 }),
+  insuranceInfo: text("insurance_info"),
+  commissionRate: decimal("commission_rate", { precision: 5, scale: 2 }),
+  rating: decimal("rating", { precision: 3, scale: 2 }).default(0.0),
+  totalJobsCompleted: integer("total_jobs_completed").default(0),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -61,14 +102,20 @@ export const userProfilesTable = pgTable("user_profiles", {
 export const ordersTable = pgTable("orders", {
   id: varchar("id", { length: 255 }).primaryKey().$defaultFn(() => crypto.randomUUID()),
   userId: varchar("user_id", { length: 255 }).notNull().references(() => usersTable.id),
-  wasteTypeId: varchar("waste_type_id", { length: 255 }).notNull().references(() => wasteTypesTable.id),
-  binSizeId: varchar("bin_size_id", { length: 255 }).notNull().references(() => binSizesTable.id),
+  wasteType: wasteTypeEnum("waste_type").notNull(),
+  binSize: binSizeEnum("bin_size").notNull(),
+  binPlacement: binPlacementEnum("bin_placement").notNull(),
   quantity: integer("quantity").notNull(),
-  placementType: varchar("placement_type", { length: 255 }).notNull(),
   specialInstructions: text("special_instructions"),
   status: orderStatusEnum("status").default("pending"),
   scheduledDate: timestamp("scheduled_date"),
   completedDate: timestamp("completed_date"),
+  // Payment processor details
+  paymentIntentId: varchar("payment_intent_id", { length: 255 }),
+  paymentStatus: paymentStatusEnum("payment_status").default("pending"),
+  // Real-time tracking
+  currentLocation: varchar("current_location", { length: 500 }),
+  lastUpdated: timestamp("last_updated").defaultNow(),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
