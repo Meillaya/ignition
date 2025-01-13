@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabaseClient';
 import { hash } from 'bcryptjs';
 import { z } from 'zod';
+import { randomUUID } from 'crypto';
 
 const signupSchema = z.object({
   email: z.string().email(),
@@ -35,6 +36,7 @@ export async function POST(request: Request) {
     const { data: newUser, error: insertError } = await supabase
       .from('users')
       .insert({
+        id: crypto.randomUUID(),
         email,
         password: hashedPassword,
         role,

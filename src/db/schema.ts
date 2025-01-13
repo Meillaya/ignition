@@ -4,7 +4,7 @@ import { relations } from 'drizzle-orm';
 export const rolesEnum = pgEnum("role", ["client", "contractor"]);
 
 export const usersTable = pgTable("users", {
-  id: integer().primaryKey().generatedAlwaysAsIdentity(),
+  id: varchar("id", { length: 255 }).primaryKey().$defaultFn(() => crypto.randomUUID()),
   email: varchar("email", { length: 255 }).notNull().unique(),
   password: varchar("password", { length: 255 }).notNull(),
   role: rolesEnum("role").notNull(),
