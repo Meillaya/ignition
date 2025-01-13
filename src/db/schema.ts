@@ -57,17 +57,14 @@ export const paymentStatusEnum = pgEnum("payment_status", [
   "failed",
   "refunded"
 ]);
-export const usersTable = pgTable("users", {
-  id: varchar("id", { length: 255 }).primaryKey().$defaultFn(() => crypto.randomUUID()),
-  email: varchar("email", { length: 255 }).notNull().unique(),
-  password: varchar("password", { length: 255 }).notNull(),
-  role: rolesEnum("role").notNull(),
-  created_at: timestamp("created_at").defaultNow(),
-  updated_at: timestamp("updated_at").defaultNow(),
-}, (table) => ({
-  emailIdx: uniqueIndex("email_idx").on(table.email),
-  roleIdx: index("role_idx").on(table.role),
-}));
+// Reference Supabase's built-in auth.users table
+export const usersTable = pgTable("auth.users", {
+  id: uuid("id").primaryKey().notNull(),
+  email: varchar("email", { length: 255 }).notNull(),
+  role: varchar("role", { length: 255 }).default('client'),
+  created_at: timestamp("created_at", { withTimezone: true }).defaultNow(),
+  updated_at: timestamp("updated_at", { withTimezone: true }).defaultNow(),
+});
 
 
 
@@ -80,8 +77,8 @@ export const usersRelations = relations(usersTable, ({ one, many }) => ({
 }));
 
 export const userProfilesTable = pgTable("user_profiles", {
-  id: varchar("id", { length: 255 }).primaryKey().$defaultFn(() => crypto.randomUUID()),
-  userId: varchar("user_id", { length: 255 }).notNull().unique().references(() => usersTable.id),
+  id: uuid("id").primaryKey().notNull(),
+  userId: uuid("user_id").notNull().unique().references(() => usersTable.id),
   firstName: varchar("first_name", { length: 255 }),
   lastName: varchar("last_name", { length: 255 }),
   phone: varchar("phone", { length: 20 }),
@@ -108,8 +105,8 @@ export const userProfilesTable = pgTable("user_profiles", {
 }));
 
 export const ordersTable = pgTable("orders", {
-  id: varchar("id", { length: 255 }).primaryKey().$defaultFn(() => crypto.randomUUID()),
-  userId: varchar("user_id", { length: 255 }).notNull().references(() => usersTable.id),
+  id: uuid("id").primaryKey().notNull(),
+  userId: uuid("user_id").notNull().references(() => usersTable.id),
   wasteType: wasteTypeEnum("waste_type").notNull(),
   binSize: binSizeEnum("bin_size").notNull(),
   binPlacement: binPlacementEnum("bin_placement").notNull(),
@@ -155,9 +152,9 @@ export const binSizesTable = pgTable("bin_sizes", {
 });
 
 export const jobAssignmentsTable = pgTable("job_assignments", {
-  id: varchar("id", { length: 255 }).primaryKey().$defaultFn(() => crypto.randomUUID()),
-  orderId: varchar("order_id", { length: 255 }).notNull().references(() => ordersTable.id),
-  contractorId: varchar("contractor_id", { length: 255 }).notNull().references(() => usersTable.id),
+  id: uuid("id").primaryKey().notNull(),
+  orderId: uuid("order_id").notNull().references(() => ordersTable.id),
+  contractorId: uuid("contractor_id").notNull().references(() => usersTable.id),
   assignedDate: timestamp("assigned_date").defaultNow(),
   status: jobStatusEnum("status").default("assigned"),
   notes: text("notes"),
