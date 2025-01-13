@@ -48,7 +48,18 @@ export function LoginForm() {
       });
 
       if (result?.error) {
-        throw new Error(result.error);
+        // Handle specific error cases
+        if (result.error === 'CredentialsSignin') {
+          throw new Error('Invalid email or password');
+        } else if (result.error === 'AccessDenied') {
+          throw new Error('Your account is not authorized to access this system');
+        } else {
+          throw new Error('Login failed. Please try again later.');
+        }
+      }
+
+      if (!result?.ok) {
+        throw new Error('Login failed. Please try again.');
       }
 
       // Redirect to unified dashboard
@@ -57,11 +68,14 @@ export function LoginForm() {
         title: "Logged in successfully",
         description: "Redirecting to your dashboard...",
       });
+      
+      // Refresh the page to ensure all session data is loaded
+      router.refresh();
     } catch (error) {
       toast({
         variant: "destructive",
         title: "Login failed",
-        description: "Please check your credentials and try again.",
+        description: error instanceof Error ? error.message : "An unexpected error occurred",
       });
     } finally {
       setIsLoading(false);
