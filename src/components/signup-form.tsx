@@ -24,7 +24,7 @@ import {
 } from './ui/select'
 import { signIn } from 'next-auth/react'
 import { useToast } from './ui/use-toast'
-
+import { supabase } from '@/lib/supabaseClient';
 
 const formSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
