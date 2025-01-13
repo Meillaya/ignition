@@ -11,10 +11,7 @@ export async function middleware(request: NextRequest) {
 
   // Redirect logged-in users from public routes
   if (publicRoutes.includes(pathname) && token) {
-    return NextResponse.redirect(new URL(
-      token.role === 'client' ? '/dashboard/client' : '/dashboard/contractor',
-      request.url
-    ))
+    return NextResponse.redirect(new URL('/dashboard', request.url))
   }
 
   // Redirect unauthenticated users from protected routes
@@ -22,12 +19,9 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/login', request.url))
   }
 
-  // Redirect to appropriate dashboard based on role
+  // Redirect to unified dashboard
   if (pathname === '/dashboard' && token) {
-    return NextResponse.redirect(new URL(
-      token.role === 'client' ? '/dashboard/client' : '/dashboard/contractor',
-      request.url
-    ))
+    return NextResponse.redirect(new URL('/dashboard', request.url))
   }
 
   return NextResponse.next()
