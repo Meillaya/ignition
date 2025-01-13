@@ -6,6 +6,7 @@ import { getServerSession } from 'next-auth';
 import authOptions from "@/pages/api/auth/[...nextauth]";
 import { redirect } from 'next/navigation';
 import { Button } from '@/components/ui/button';
+import { configureOAuth } from '@/lib/auth';
 import { ArrowLeft } from 'lucide-react';
 import { Session } from 'next-auth';
 

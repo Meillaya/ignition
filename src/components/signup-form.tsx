@@ -6,6 +6,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
 import { Button } from './ui/button'
+import Image from 'next/image'
 import {
   Form,
   FormControl,
@@ -201,6 +202,51 @@ export function SignupForm() {
           )}
         </Button>
       </form>
+
+      <div className="relative">
+        <div className="absolute inset-0 flex items-center">
+          <span className="w-full border-t" />
+        </div>
+        <div className="relative flex justify-center text-xs uppercase">
+          <span className="bg-background px-2 text-muted-foreground">
+            Or continue with
+          </span>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <Button 
+          variant="outline" 
+          type="button"
+          onClick={() => signIn('google', { callbackUrl: '/dashboard' })}
+          disabled={isLoading}
+        >
+          <Image
+            src="/google.svg"
+            alt="Google logo"
+            width={20}
+            height={20}
+            className="mr-2"
+          />
+          Google
+        </Button>
+
+        <Button 
+          variant="outline" 
+          type="button"
+          onClick={() => signIn('apple', { callbackUrl: '/dashboard' })}
+          disabled={isLoading}
+        >
+          <Image
+            src="/apple.svg"
+            alt="Apple logo"
+            width={20}
+            height={20}
+            className="mr-2"
+          />
+          Apple
+        </Button>
+      </div>
     </Form>
   )
 }
