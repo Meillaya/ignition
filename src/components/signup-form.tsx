@@ -28,8 +28,16 @@ import { useToast } from './ui/use-toast'
 
 const formSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
-  password: z.string().min(8, { message: "Password must be at least 8 characters" }),
+  password: z.string()
+    .min(8, { message: "Password must be at least 8 characters" })
+    .regex(/[A-Z]/, { message: "Must contain at least one uppercase letter" })
+    .regex(/[0-9]/, { message: "Must contain at least one number" })
+    .regex(/[^A-Za-z0-9]/, { message: "Must contain at least one special character" }),
+  confirmPassword: z.string(),
   role: z.enum(['client', 'contractor'], { required_error: "Please select a role" }),
+}).refine(data => data.password === data.confirmPassword, {
+  message: "Passwords don't match",
+  path: ["confirmPassword"]
 })
 
 export function SignupForm() {
@@ -42,6 +50,7 @@ export function SignupForm() {
     defaultValues: {
       email: "",
       password: "",
+      confirmPassword: "",
       role: undefined,
     },
   })
@@ -116,7 +125,28 @@ export function SignupForm() {
             <FormItem>
               <FormLabel>Password</FormLabel>
               <FormControl>
-                <Input type="password" placeholder="Create a password" {...field} />
+                <Input 
+                  type="password" 
+                  placeholder="Create a password" 
+                  {...field} 
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="confirmPassword"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Confirm Password</FormLabel>
+              <FormControl>
+                <Input 
+                  type="password" 
+                  placeholder="Confirm your password" 
+                  {...field} 
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -144,7 +174,14 @@ export function SignupForm() {
           )}
         />
         <Button type="submit" className="w-full" disabled={isLoading}>
-          {isLoading ? "Creating account..." : "Sign up"}
+          {isLoading ? (
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              <span>Creating account...</span>
+            </div>
+          ) : (
+            "Sign up"
+          )}
         </Button>
       </form>
     </Form>
