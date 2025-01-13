@@ -1,14 +1,13 @@
-import  Metadata  from "next"
-import Link from 'next/link'
-import Image from 'next/image'
-import { LoginForm } from '@/components/login-form'
-import { getServerSession } from 'next-auth'
-import authOptions from "@/pages/api/auth/[...nextauth]"
-import { redirect } from 'next/navigation'
-import { Button } from '@/components/ui/button'
-import { ArrowLeft } from 'lucide-react'
-import {Session} from 'next-auth'
-
+import Metadata from "next"
+import Link from 'next/link';
+import Image from 'next/image';
+import { LoginForm } from '@/components/login-form';
+import { getServerSession } from 'next-auth';
+import authOptions from "@/pages/api/auth/[...nextauth]";
+import { redirect } from 'next/navigation';
+import { Button } from '@/components/ui/button';
+import { ArrowLeft } from 'lucide-react';
+import { Session } from 'next-auth';
 
 export const metadata: Metadata = {
   title: 'Login - Fox In The Truck',
@@ -20,9 +19,9 @@ export default async function LoginPage({
 }: {
   searchParams: { callbackUrl?: string }
 }) {
-  const session = await getServerSession(authOptions);
+  const session: Session | null = await getServerSession(authOptions);
   
-  if (session) {
+  if (session && session.user) {
     const redirectUrl = searchParams.callbackUrl || 
       (session.user.role === 'client' ? '/dashboard/client' : '/dashboard/contractor');
     redirect(redirectUrl);

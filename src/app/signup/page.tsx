@@ -1,13 +1,13 @@
-import Metadata from "next"
-import Link from 'next/link'
-import Image from 'next/image'
-import { SignupForm } from '@/components/signup-form'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/pages/api/auth/[...nextauth]'
-import { redirect } from 'next/navigation'
-import { Button } from '@/components/ui/button'
-import { ArrowLeft } from 'lucide-react'
-
+import  Metadata  from "next";
+import Link from 'next/link';
+import Image from 'next/image';
+import { SignupForm } from '@/components/signup-form';
+import { getServerSession } from 'next-auth';
+import authOptions from "@/pages/api/auth/[...nextauth]";
+import { redirect } from 'next/navigation';
+import { Button } from '@/components/ui/button';
+import { ArrowLeft } from 'lucide-react';
+import { Session } from 'next-auth';
 
 export const metadata: Metadata = {
   title: 'Sign Up - Fox In The Truck',
@@ -15,10 +15,10 @@ export const metadata: Metadata = {
 }
 
 export default async function SignupPage() {
-  const session = await getServerSession(authOptions)
+  const session: Session | null = await getServerSession(authOptions);
   
-  if (session) {
-    redirect(session.user.role === 'client' ? '/dashboard/client' : '/dashboard/contractor')
+  if (session && session.user) {
+    redirect(session.user.role === 'client' ? '/dashboard/client' : '/dashboard/contractor');
   }
   return (
    
