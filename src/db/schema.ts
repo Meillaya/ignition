@@ -1,8 +1,29 @@
-import { integer, pgTable, varchar, timestamp, pgEnum } from "drizzle-orm/pg-core";
+import { integer, pgTable, varchar, timestamp, pgEnum, decimal, text } from "drizzle-orm/pg-core";
 import { relations } from 'drizzle-orm';
 
 export const rolesEnum = pgEnum("role", ["client", "contractor"]);
+// Enums for status fields
+export const orderStatusEnum = pgEnum("order_status", [
+  "pending",
+  "scheduled",
+  "in_progress",
+  "completed",
+  "cancelled"
+]);
 
+export const jobStatusEnum = pgEnum("job_status", [
+  "assigned",
+  "in_progress",
+  "completed",
+  "cancelled"
+]);
+
+export const paymentStatusEnum = pgEnum("payment_status", [
+  "pending",
+  "completed",
+  "failed",
+  "refunded"
+]);
 export const usersTable = pgTable("users", {
   id: varchar("id", { length: 255 }).primaryKey().$defaultFn(() => crypto.randomUUID()),
   email: varchar("email", { length: 255 }).notNull().unique(),
@@ -13,15 +34,6 @@ export const usersTable = pgTable("users", {
 });
 
 
-
-// export const usersTable = pgTable("users", {
-//   id: varchar("id", { length: 255 }).primaryKey().$defaultFn(() => crypto.randomUUID()),
-//   email: varchar("email", { length: 255 }).notNull().unique(),
-//   password: varchar("password", { length: 255 }).notNull(),
-//   role: rolesEnum("role").notNull(),
-//   createdAt: timestamp("created_at").defaultNow(),
-//   updatedAt: timestamp("updated_at").defaultNow(),
-// });
 
 export const usersRelations = relations(usersTable, ({ one, many }) => ({
   profile: one(userProfilesTable, {
@@ -103,28 +115,7 @@ export const paymentsTable = pgTable("payments", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-// Enums for status fields
-export const orderStatusEnum = pgEnum("order_status", [
-  "pending",
-  "scheduled",
-  "in_progress",
-  "completed",
-  "cancelled"
-]);
 
-export const jobStatusEnum = pgEnum("job_status", [
-  "assigned",
-  "in_progress",
-  "completed",
-  "cancelled"
-]);
-
-export const paymentStatusEnum = pgEnum("payment_status", [
-  "pending",
-  "completed",
-  "failed",
-  "refunded"
-]);
 
 // Relations
 export const ordersRelations = relations(ordersTable, ({ one, many }) => ({
