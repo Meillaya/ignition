@@ -1,17 +1,15 @@
-import { pgTable, serial, varchar, timestamp, pgEnum  } from "drizzle-orm/pg-core";
-
-import * as t from "drizzle-orm/pg-core";
+import { pgTable, varchar, timestamp, pgEnum } from "drizzle-orm/pg-core";
 import { relations } from 'drizzle-orm';
 
 export const rolesEnum = pgEnum("role", ["client", "contractor"]);
 
 export const usersTable = pgTable("users", {
-  id: t.integer().primaryKey().generatedAlwaysAsIdentity(),
+  id: varchar("id").primaryKey(),
   email: varchar("email", { length: 255 }).notNull().unique(),
   password: varchar("password", { length: 255 }).notNull(),
   role: rolesEnum("role").notNull(),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
+  created_at: timestamp("created_at").defaultNow(),
+  updated_at: timestamp("updated_at").defaultNow(),
 });
 
 

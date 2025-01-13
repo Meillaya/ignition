@@ -1,10 +1,7 @@
 import NextAuth from 'next-auth';
 import crypto from 'crypto';
 import CredentialsProvider from 'next-auth/providers/credentials';
-import { getXataClient } from '@/xata';
-import { drizzle } from 'drizzle-orm/xata-http';
-import { usersTable } from '@/db/schema';
-import { eq } from 'drizzle-orm';
+import { supabase } from '@/lib/supabaseClient';
 import { compare } from 'bcryptjs';
 import { DefaultSession, Session } from 'next-auth'
 import { JWT } from 'next-auth/jwt'
@@ -87,20 +84,16 @@ export default NextAuth({
             return null;
           }
 
-          const xata = getXataClient();
-          const db = drizzle(xata);
-          
-          const users = await db.select()
-            .from(usersTable)
-            .where(eq(usersTable.email, credentials.email))
-            .limit(1);
+          const { data: user, error } = await supabase
+            .from('users')
+            .select('*')
+            .eq('email', credentials.email)
+            .single();
 
-          if (users.length === 0) {
+          if (!user) {
             console.error('User not found:', credentials.email);
             throw new Error("User not found");
           }
-
-          const user = users[0];
           if (!user.password) {
             console.error('Invalid user configuration:', user.id);
             throw new Error("Invalid user configuration");
