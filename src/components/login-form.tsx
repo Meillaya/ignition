@@ -45,29 +45,22 @@ export function LoginForm() {
         redirect: false,
         email: values.email,
         password: values.password,
-        callbackUrl: '/dashboard' // This will be handled by NextAuth
       });
 
       if (result?.error) {
         throw new Error(result.error);
       }
 
-      // Get the callback URL from the query parameters
-      const searchParams = new URLSearchParams(window.location.search);
-      const callbackUrl = searchParams.get('callbackUrl') || '/dashboard';
-      
-      // Redirect to the appropriate dashboard based on role
-      router.push(callbackUrl);
-
-      if (result?.error) {
-        throw new Error(result.error);
+      // Fetch user role after successful login
+      const userResponse = await fetch('/api/login');
+      if (!userResponse.ok) {
+        throw new Error('Failed to fetch user data');
       }
 
-      if (result?.url) {
-        // Redirect to the callback URL
-        router.push(result.url);
-      }
+      const { user } = await userResponse.json();
+      const redirectUrl = user.role === 'client' ? '/dashboard/client' : '/dashboard/contractor';
 
+      router.push(redirectUrl);
       toast({
         title: "Logged in successfully",
         description: "Redirecting to your dashboard...",

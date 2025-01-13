@@ -15,14 +15,17 @@ export const metadata: Metadata = {
   description: 'Login to your Fox In The Truck account',
 }
 
-export default async function LoginPage() {
-  const session = await getServerSession(authOptions)
+export default async function LoginPage({
+  searchParams,
+}: {
+  searchParams: { callbackUrl?: string }
+}) {
+  const session = await getServerSession(authOptions);
   
   if (session) {
-    const searchParams = new URLSearchParams(searchParamsString || '');
-    const callbackUrl = searchParams.get('callbackUrl') || 
+    const redirectUrl = searchParams.callbackUrl || 
       (session.user.role === 'client' ? '/dashboard/client' : '/dashboard/contractor');
-    redirect(callbackUrl);
+    redirect(redirectUrl);
   }
   return (
 

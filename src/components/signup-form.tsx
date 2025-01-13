@@ -63,22 +63,20 @@ export function SignupForm() {
         throw new Error(errorData.error || 'Signup failed');
       }
 
-      // Sign in the new user
+      // Automatically log in after signup
       const result = await signIn('credentials', {
+        redirect: false,
         email: values.email,
         password: values.password,
-        redirect: false,
-        callbackUrl: values.role === 'client' ? '/dashboard/client' : '/dashboard/contractor'
       });
 
       if (result?.error) {
         throw new Error(result.error);
       }
 
-      if (result?.url) {
-        // Redirect to the appropriate dashboard based on role
-        router.push(result.url);
-      }
+      // Redirect based on role
+      const redirectUrl = values.role === 'client' ? '/dashboard/client' : '/dashboard/contractor';
+      router.push(redirectUrl);
 
       toast({
         title: "Account created successfully",
