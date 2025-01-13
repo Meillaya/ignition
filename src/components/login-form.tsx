@@ -17,6 +17,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { useToast } from '@/components/ui/use-toast'
 import { signIn } from 'next-auth/react'
+import { supabase } from '@/lib/supabaseClient'
 
 
 
@@ -41,6 +42,18 @@ export function LoginForm() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
     try {
+      // First validate credentials with Supabase
+      const { data: user, error } = await supabase
+        .from('users')
+        .select('*')
+        .eq('email', values.email)
+        .single();
+
+      if (error || !user) {
+        throw new Error('Invalid email or password');
+      }
+
+      // Then authenticate with NextAuth
       const result = await signIn('credentials', {
         redirect: false,
         email: values.email,
@@ -48,14 +61,7 @@ export function LoginForm() {
       });
 
       if (result?.error) {
-        // Handle specific error cases
-        if (result.error === 'CredentialsSignin') {
-          throw new Error('Invalid email or password');
-        } else if (result.error === 'AccessDenied') {
-          throw new Error('Your account is not authorized to access this system');
-        } else {
-          throw new Error('Login failed. Please try again later.');
-        }
+        throw new Error(result.error);
       }
 
       if (!result?.ok) {

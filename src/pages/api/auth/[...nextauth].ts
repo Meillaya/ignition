@@ -85,25 +85,34 @@ export default NextAuth({
             return null;
           }
 
-          const { data: user, error } = await supabase
+          // First validate email exists
+          const { data: user, error: userError } = await supabase
             .from('users')
             .select('*')
             .eq('email', credentials.email)
             .single();
 
-          if (!user) {
+          if (userError || !user) {
             console.error('User not found:', credentials.email);
-            throw new Error("User not found");
+            throw new Error("Invalid email or password");
           }
-          if (!user.password) {
-            console.error('Invalid user configuration:', user.id);
-            throw new Error("Invalid user configuration");
+
+          // Then validate password
+          const { data: authData, error: authError } = await supabase
+            .from('users')
+            .select('password')
+            .eq('email', credentials.email)
+            .single();
+
+          if (authError || !authData?.password) {
+            console.error('Password validation failed:', user.id);
+            throw new Error("Invalid email or password");
           }
-          
-          const isValid = await compare(credentials.password, user.password);
+
+          const isValid = await compare(credentials.password, authData.password);
           if (!isValid) {
             console.error('Invalid password for user:', user.id);
-            throw new Error("Invalid password");
+            throw new Error("Invalid email or password");
           }
 
           // Type assertion is safe here because we've already validated the role
