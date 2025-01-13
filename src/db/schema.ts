@@ -1,4 +1,4 @@
-import { integer, pgTable, varchar, timestamp, pgEnum, decimal, text } from "drizzle-orm/pg-core";
+import { integer, pgTable, varchar, timestamp, pgEnum, decimal, text, index, uniqueIndex } from "drizzle-orm/pg-core";
 import { relations } from 'drizzle-orm';
 
 export const rolesEnum = pgEnum("role", ["client", "contractor"]);
