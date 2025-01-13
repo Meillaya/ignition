@@ -5,31 +5,76 @@ import { usePathname, useRouter } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { Home, Package, Truck, FileText, Settings, LogOut, DollarSign } from 'lucide-react'
+import { 
+  Home, 
+  Package, 
+  Truck, 
+  FileText, 
+  Settings, 
+  LogOut, 
+  DollarSign,
+  ClipboardList,
+  Briefcase,
+  CalendarCheck
+} from 'lucide-react'
 import { signOut } from 'next-auth/react'
 import { useSession } from 'next-auth/react'
 import Image from 'next/image'
 
 const getRoutes = (role: 'client' | 'contractor') => {
   const commonRoutes = [
-    { name: 'Dashboard', href: `/dashboard/${role}`, icon: Home },
-    { name: 'Settings', href: '/dashboard/settings', icon: Settings },
+    { 
+      name: 'Dashboard', 
+      href: '/dashboard', 
+      icon: Home 
+    },
+    { 
+      name: 'Settings', 
+      href: '/dashboard/settings', 
+      icon: Settings 
+    },
   ]
 
   const clientRoutes = [
-    { name: 'New Order', href: '/dashboard/client/new-order', icon: Package },
-    { name: 'Order History', href: '/dashboard/client/order-history', icon: FileText },
+    { 
+      name: 'New Order', 
+      href: '/dashboard/orders/new', 
+      icon: Package 
+    },
+    { 
+      name: 'My Orders', 
+      href: '/dashboard/orders', 
+      icon: ClipboardList 
+    },
+    { 
+      name: 'Scheduled Pickups', 
+      href: '/dashboard/schedule', 
+      icon: CalendarCheck 
+    },
   ]
 
   const contractorRoutes = [
-    { name: 'Available Jobs', href: '/dashboard/contractor/available-jobs', icon: Truck },
-    { name: 'Job History', href: '/dashboard/contractor/job-history', icon: FileText },
-    { name: 'Earnings', href: '/dashboard/contractor/earnings', icon: DollarSign },
+    { 
+      name: 'Available Jobs', 
+      href: '/dashboard/jobs', 
+      icon: Briefcase 
+    },
+    { 
+      name: 'My Jobs', 
+      href: '/dashboard/jobs/my', 
+      icon: Truck 
+    },
+    { 
+      name: 'Earnings', 
+      href: '/dashboard/earnings', 
+      icon: DollarSign 
+    },
   ]
 
-  return role === 'client' 
-    ? [...commonRoutes, ...clientRoutes]
-    : [...commonRoutes, ...contractorRoutes]
+  return [
+    ...commonRoutes,
+    ...(role === 'client' ? clientRoutes : contractorRoutes)
+  ]
 }
 
 export function Sidebar() {
@@ -42,20 +87,25 @@ export function Sidebar() {
     router.push('/login')
   }
 
-  const routes = getRoutes(session?.user?.role || 'client')
+  if (!session?.user) {
+    return null
+  }
+
+  const routes = getRoutes(session.user.role)
 
   return (
     <div className="flex h-full w-64 flex-col border-r bg-background">
-      <div className="flex h-14 items-center border-b px-4">
-      <Image
+      <div className="flex h-14 items-center border-b px-4 gap-2">
+        <Image
           src="/foxinthetruck.jpg"
           alt="Fox In The Truck"
           width={35}
-          height={20}
+          height={35}
           className="rounded-full shadow-lg"
         />
         <span className="text-lg font-semibold">Fox In The Truck</span>
       </div>
+      
       <ScrollArea className="flex-1">
         <nav className="flex flex-col gap-1 p-2">
           {routes.map((route) => (
@@ -73,7 +123,13 @@ export function Sidebar() {
           ))}
         </nav>
       </ScrollArea>
+      
       <div className="border-t p-4">
+        <div className="mb-4 px-2 text-sm text-muted-foreground">
+          <p>Logged in as:</p>
+          <p className="font-medium">{session.user.email}</p>
+          <p className="capitalize">({session.user.role})</p>
+        </div>
         <Button 
           variant="outline" 
           className="w-full justify-start"
