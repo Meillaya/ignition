@@ -135,7 +135,7 @@ export const wasteTypesTable = pgTable("waste_types", {
   priceMultiplier: decimal("price_multiplier", { precision: 5, scale: 2 }).notNull(),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
-}));
+});
 
 export const binSizesTable = pgTable("bin_sizes", {
   id: varchar("id", { length: 255 }).primaryKey().$defaultFn(() => crypto.randomUUID()),
