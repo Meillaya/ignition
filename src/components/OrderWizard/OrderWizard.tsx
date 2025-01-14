@@ -199,8 +199,8 @@ const OrderWizard: React.FC = () => {
               Previous
             </Button>
             <Button
-              onClick={currentStep === steps.length ? handleSubmitOrder : nextStep}
-              disabled={currentStep === steps.length && !orderDetails.contactEmail}
+              onClick={nextStep}
+              disabled={currentStep === steps.length}
               className="px-6 bg-orange-500 hover:bg-orange-600 text-white"
             >
               {currentStep === steps.length ? 'Submit Order' : 'Next'}

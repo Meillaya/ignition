@@ -131,9 +131,9 @@ export default function LandingPage() {
         </section>
 
         {/* About Section */}
-        <section id="about" className="py-20">
+        {/* <section id="about" className="py-20">
           <AboutSection />
-        </section>
+        </section> */}
       </main>
 
       {/* Footer */}
