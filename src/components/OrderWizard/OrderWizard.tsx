@@ -1,6 +1,9 @@
 "use client"
 
 import React, { createContext, useContext, useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import { createOrder } from '@/lib/api/orders'
+import { useToast } from '@/components/ui/use-toast'
 import { motion, AnimatePresence } from 'framer-motion'
 import { OrderDetails, WizardContextType, PricingInfo } from '@/types/wizard'
 import { Button } from '@/components/ui/button'
@@ -47,6 +50,8 @@ const pricingInfo: PricingInfo = {
 }
 
 const OrderWizard: React.FC = () => {
+  const router = useRouter()
+  const { toast } = useToast()
   const [currentStep, setCurrentStep] = useState(1)
   const [orderDetails, setOrderDetails] = useState<OrderDetails>({
     wasteType: null,
@@ -194,8 +199,8 @@ const OrderWizard: React.FC = () => {
               Previous
             </Button>
             <Button
-              onClick={nextStep}
-              disabled={currentStep === steps.length}
+              onClick={currentStep === steps.length ? handleSubmitOrder : nextStep}
+              disabled={currentStep === steps.length && !orderDetails.contactEmail}
               className="px-6 bg-orange-500 hover:bg-orange-600 text-white"
             >
               {currentStep === steps.length ? 'Submit Order' : 'Next'}

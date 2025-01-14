@@ -115,6 +115,8 @@ export const ordersTable = pgTable("orders", {
   status: orderStatusEnum("status").default("pending"),
   scheduledDate: timestamp("scheduled_date"),
   completedDate: timestamp("completed_date"),
+  totalCost: decimal("total_cost", { precision: 10, scale: 2 }).notNull(),
+  contractorId: uuid("contractor_id").references(() => usersTable.id),
   // Payment processor details
   paymentIntentId: varchar("payment_intent_id", { length: 255 }),
   paymentStatus: paymentStatusEnum("payment_status").default("pending"),
@@ -124,8 +126,11 @@ export const ordersTable = pgTable("orders", {
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 }, (table) => ({
-  contractorStatusIdx: index("contractor_status_idx").on(table.contractorStatus),
-  userIdIdx: uniqueIndex("user_id_idx").on(table.userId),
+  statusIdx: index("status_idx").on(table.status),
+  scheduledDateIdx: index("scheduled_date_idx").on(table.scheduledDate),
+  paymentStatusIdx: index("payment_status_idx").on(table.paymentStatus),
+  userIdIdx: index("user_id_idx").on(table.userId),
+  contractorIdIdx: index("contractor_id_idx").on(table.contractorId),
 }));
 
 export const wasteTypesTable = pgTable("waste_types", {
