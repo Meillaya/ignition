@@ -135,10 +135,6 @@ export const wasteTypesTable = pgTable("waste_types", {
   priceMultiplier: decimal("price_multiplier", { precision: 5, scale: 2 }).notNull(),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
-}, (table) => ({
-  statusIdx: index("status_idx").on(table.status),
-  orderIdIdx: index("order_id_idx").on(table.orderId),
-  contractorIdIdx: index("contractor_id_idx").on(table.contractorId),
 }));
 
 export const binSizesTable = pgTable("bin_sizes", {
