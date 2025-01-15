@@ -64,11 +64,6 @@ export default function LandingPage() {
         </div>
       </nav>
 
-      {/* Subtle pattern background */}
-      <div className="absolute inset-0 z-0">
-        <div className="absolute inset-0 bg-[url('/cube-pattern.svg')] bg-repeat opacity-5" />
-      </div>
-
       {/* Decorative prism effect */}
       <div className="absolute inset-0 z-0 overflow-hidden">
         <div className="absolute -top-1/2 -left-1/2 w-full h-full bg-gradient-to-r from-orange-500/10 via-red-500/10 to-yellow-500/10 blur-3xl transform rotate-12 animate-pulse" />
