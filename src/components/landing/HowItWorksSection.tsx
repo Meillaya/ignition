@@ -48,9 +48,13 @@ export default function HowItWorksSection() {
       </div>
       <div className="mt-12 grid gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
         {steps.map((step, index) => (
-          <div key={index} className="relative group">
-            <div className="absolute inset-0 bg-gradient-to-r from-orange-400 to-red-500 rounded-lg opacity-0 group-hover:opacity-10 transition-opacity duration-300"></div>
-            <div className="relative bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+          <div 
+            key={index} 
+            className="relative group fade-in-up"
+            style={{ animationDelay: `${index * 200}ms` }}
+          >
+            <div className="absolute inset-0 bg-gradient-to-r from-orange-400 to-red-500 rounded-lg opacity-0 group-hover:opacity-10 transition-opacity duration-300 rotating-border" />
+            <div className="relative bg-white dark:bg-gray-800 p-6 rounded-lg shadow hover-lift">
               <div className="flex items-center justify-center w-12 h-12 bg-orange-100 dark:bg-orange-900 text-orange-500 dark:text-orange-300 rounded-full mb-4">
                 <step.icon className="h-6 w-6" />
               </div>

@@ -38,10 +38,14 @@ export default function FeaturesSection() {
         {features.map((feature, index) => (
           <div
             key={index}
-            className="relative group bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
+            className="relative group bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md transition-all duration-300 hover:shadow-lg hover:-translate-y-1 fade-in-up"
+            style={{ animationDelay: `${index * 200}ms` }}
           >
-            <div className="absolute inset-0 bg-gradient-to-r from-orange-400 to-red-500 rounded-lg opacity-0 group-hover:opacity-10 transition-opacity duration-300"></div>
-            <feature.icon className="h-12 w-12 text-orange-500 mb-4" />
+            <div className="absolute inset-0 bg-gradient-to-r from-orange-400 to-red-500 rounded-lg opacity-0 group-hover:opacity-10 transition-opacity duration-300 rotating-border" />
+            <div className="relative">
+              <div className="absolute -inset-2 bg-gradient-to-r from-orange-400 to-red-500 rounded-full blur opacity-0 group-hover:opacity-30 transition-opacity duration-300" />
+              <feature.icon className="h-12 w-12 text-orange-500 mb-4 relative text-shadow-animation" />
+            </div>
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{feature.title}</h3>
             <p className="text-gray-600 dark:text-gray-300">{feature.description}</p>
           </div>

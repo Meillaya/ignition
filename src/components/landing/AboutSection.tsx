@@ -13,7 +13,8 @@ export default function AboutSection() {
         </p>
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-        <div>
+        <div className="space-y-6">
+          <div className="fade-in-up" style={{ animationDelay: '100ms' }}>
           <p className="text-lg text-gray-600 dark:text-gray-300 mb-6">
             At Fox In The Truck, we're passionate about transforming the construction industry's approach to waste management. Founded in 2020, our mission is to make sustainable waste disposal accessible, efficient, and cost-effective for construction projects of all sizes.
           </p>

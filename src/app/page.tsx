@@ -81,13 +81,16 @@ export default function LandingPage() {
         <section className="flex flex-col justify-center items-center min-h-screen px-4 sm:px-6 lg:px-8 pt-16">
           <div className="text-center max-w-3xl mx-auto">
             <div className="mb-8 flex justify-center">
-              <Image
-                src="/foxinthetruck.jpg"
-                alt="Fox In The Truck"
-                width={200}
-                height={200}
-                className="rounded-full shadow-lg"
-              />
+              <div className="relative">
+                <div className="absolute inset-0 rounded-full bg-gradient-to-r from-orange-400 to-red-500 blur-2xl opacity-50 animate-pulse" />
+                <Image
+                  src="/foxinthetruck.jpg"
+                  alt="Fox In The Truck"
+                  width={200}
+                  height={200}
+                  className="rounded-full shadow-lg float-animation relative"
+                />
+              </div>
             </div>
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-gray-900 dark:text-white mb-6">
               Smart Dumpster Rental
