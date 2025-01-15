@@ -214,10 +214,10 @@ export function SignupForm() {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
-        <Button 
-          variant="outline" 
+      <div className="flex justify-center gap-4">
+        <button
           type="button"
+          className="social-login-btn google-btn"
           onClick={() => signIn('google', { callbackUrl: '/dashboard' })}
           disabled={isLoading}
         >
@@ -226,14 +226,12 @@ export function SignupForm() {
             alt="Google logo"
             width={20}
             height={20}
-            className="mr-2"
           />
-          Google
-        </Button>
+        </button>
 
-        <Button 
-          variant="outline" 
+        <button
           type="button"
+          className="social-login-btn apple-btn"
           onClick={() => signIn('apple', { callbackUrl: '/dashboard' })}
           disabled={isLoading}
         >
@@ -242,10 +240,8 @@ export function SignupForm() {
             alt="Apple logo"
             width={20}
             height={20}
-            className="mr-2"
           />
-          Apple
-        </Button>
+        </button>
       </div>
     </Form>
   )

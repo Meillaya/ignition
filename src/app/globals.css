@@ -180,6 +180,24 @@
   animation: pulse 8s infinite;
 }
 
+/* Social login button styles */
+.social-login-btn {
+  @apply p-2 rounded-full w-10 h-10 flex items-center justify-center;
+  transition: all 0.2s ease;
+}
+
+.social-login-btn:hover {
+  transform: scale(1.1);
+}
+
+.google-btn {
+  @apply bg-white border border-gray-200 hover:bg-gray-50;
+}
+
+.apple-btn {
+  @apply bg-black text-white hover:bg-gray-900;
+}
+
 /* Utility classes for animations */
 .animate-fade-in {
   animation: fadeIn 0.5s ease-out forwards;
