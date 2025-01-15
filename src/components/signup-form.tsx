@@ -191,7 +191,11 @@ export function SignupForm() {
             </FormItem>
           )}
         />
-        <Button type="submit" className="w-full" disabled={isLoading}>
+        <Button 
+          type="submit" 
+          className="w-full hover:bg-primary/90 transition-colors" 
+          disabled={isLoading}
+        >
           {isLoading ? (
             <div className="flex items-center gap-2">
               <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -203,7 +207,7 @@ export function SignupForm() {
         </Button>
       </form>
 
-      <div className="relative">
+      <div className="relative my-6">
         <div className="absolute inset-0 flex items-center">
           <span className="w-full border-t" />
         </div>
@@ -214,7 +218,7 @@ export function SignupForm() {
         </div>
       </div>
 
-      <div className="flex justify-center gap-4">
+      <div className="social-buttons-container">
         <button
           type="button"
           className="social-login-btn google-btn"

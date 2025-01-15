@@ -182,20 +182,30 @@
 
 /* Social login button styles */
 .social-login-btn {
-  @apply p-2 rounded-full w-10 h-10 flex items-center justify-center;
+  @apply p-2 rounded-full w-12 h-12 flex items-center justify-center;
   transition: all 0.2s ease;
+  border: 1px solid;
 }
 
 .social-login-btn:hover {
-  transform: scale(1.1);
+  transform: scale(1.05);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .google-btn {
-  @apply bg-white border border-gray-200 hover:bg-gray-50;
+  @apply bg-white border-gray-200 hover:bg-gray-50;
 }
 
 .apple-btn {
-  @apply bg-black text-white hover:bg-gray-900;
+  @apply bg-black text-white border-black hover:bg-gray-900;
+}
+
+.social-buttons-container {
+  @apply flex justify-center gap-4 mt-6;
+}
+
+.social-buttons-container button {
+  @apply shadow-sm;
 }
 
 /* Utility classes for animations */
