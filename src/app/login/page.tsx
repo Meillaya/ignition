@@ -58,10 +58,10 @@ export default async function LoginPage({
 
         <div className="flex justify-center space-x-4 mt-6">
           <Button variant="outline" size="icon" className="rounded-full w-10 h-10">
-            <Image src="/google-logo.svg" alt="Google" width={20} height={20} />
+            <Image src="/google.svg" alt="Google" width={20} height={20} />
           </Button>
           <Button variant="outline" size="icon" className="rounded-full w-10 h-10">
-            <Image src="/apple-logo.svg" alt="Apple" width={20} height={20} />
+            <Image src="/apple.svg" alt="Apple" width={20} height={20} />
           </Button>
         </div>
 

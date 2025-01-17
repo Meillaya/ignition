@@ -59,11 +59,6 @@ const getRoutes = (role: 'client' | 'contractor') => {
       href: '/dashboard/my-jobs', 
       icon: Truck 
     },
-    { 
-      name: 'Earnings', 
-      href: '/dashboard/earnings', 
-      icon: DollarSign 
-    },
   ]
 
   return [

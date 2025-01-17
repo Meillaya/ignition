@@ -1,5 +1,4 @@
 import NextAuth from 'next-auth';
-import crypto from 'crypto';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import { supabase } from '@/lib/supabaseClient';
 import { compare } from 'bcryptjs';
