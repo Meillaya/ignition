@@ -6,6 +6,14 @@ const isProtectedRoute = createRouteMatcher([
   '/profile(.*)'
 ]);
 
+const isContractorRoute = createRouteMatcher([
+  '/contractor(.*)'
+]);
+
+const isClientRoute = createRouteMatcher([
+  '/client(.*)'
+]);
+
 const isPublicRoute = createRouteMatcher([
   '/',
   '/login(.*)',
@@ -18,7 +26,20 @@ const isPublicRoute = createRouteMatcher([
 
 export default clerkMiddleware(async (auth, req) => {
   // Protect routes that require authentication
-  if (isProtectedRoute(req)) await auth.protect()
+  if (isProtectedRoute(req)) {
+    const { userId, sessionClaims } = await auth().protect()
+    
+    // Check role-based access
+    const role = sessionClaims?.publicMetadata?.role || 'client'
+    
+    if (isContractorRoute(req) && role !== 'contractor') {
+      return new Response('Unauthorized', { status: 401 })
+    }
+    
+    if (isClientRoute(req) && role !== 'client') {
+      return new Response('Unauthorized', { status: 401 })
+    }
+  }
   
   // Allow public routes to bypass authentication
   if (isPublicRoute(req)) {
