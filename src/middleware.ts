@@ -9,6 +9,10 @@ const isProtectedRoute = createRouteMatcher([
   '/profile(.*)'
 ]);
 
+const isAdminRoute = createRouteMatcher([
+  '/admin(.*)'
+]);
+
 const isContractorRoute = createRouteMatcher([
   '/contractor(.*)'
 ]);
@@ -45,7 +49,25 @@ export default clerkMiddleware(async (auth, req: NextRequest) => {
     return NextResponse.redirect(onboardingUrl)
   }
 
-  // If the user is logged in and the route is protected, let them view.
+  // Role-based access control
+  const userRole = sessionClaims?.metadata?.role as Roles | undefined
+  
+  // Admin routes
+  if (isAdminRoute(req) && userRole !== 'admin') {
+    return NextResponse.redirect(new URL('/', req.url))
+  }
+
+  // Contractor routes
+  if (isContractorRoute(req) && userRole !== 'contractor') {
+    return NextResponse.redirect(new URL('/', req.url))
+  }
+
+  // Client routes
+  if (isClientRoute(req) && userRole !== 'client') {
+    return NextResponse.redirect(new URL('/', req.url))
+  }
+
+  // If the user is logged in and the route is protected, let them view
   if (userId && !isPublicRoute(req)) return NextResponse.next()
 })
 
