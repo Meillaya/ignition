@@ -1,5 +1,6 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
 import { NextRequest, NextResponse } from 'next/server'
+import { Roles } from './types/globals';
 
 const isOnboardingRoute = createRouteMatcher(['/onboarding'])
 
