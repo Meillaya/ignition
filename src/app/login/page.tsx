@@ -1,30 +1,16 @@
 import { Metadata } from "next"
 import Link from 'next/link';
 import Image from 'next/image';
-import { LoginForm } from '@/components/login-form';
-import { getServerSession } from 'next-auth';
-import authOptions from "@/pages/api/auth/[...nextauth]";
-import { redirect } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
-import { Session } from 'next-auth';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
+import { SignIn } from '@clerk/nextjs'
 export const metadata: Metadata = {
   title: 'Login - Fox In The Truck',
   description: 'Login to your Fox In The Truck account',
 }
 
-export default async function LoginPage({
-  searchParams,
-}: {
-  searchParams: { callbackUrl?: string }
-}) {
-  const session: Session | null = await getServerSession(authOptions);
-  
-  if (session && session.user) {
-    const redirectUrl = searchParams.callbackUrl || '/dashboard';
-    redirect(redirectUrl);
-  }
+export default function LoginPage() {
   return (
 
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-orange-50 via-white to-orange-50 dark:from-orange-950 dark:via-gray-950 dark:to-orange-950 p-4">
@@ -45,25 +31,23 @@ export default async function LoginPage({
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <LoginForm />
-
-        <div className="relative mt-6">
-          <div className="absolute inset-0 flex items-center">
-            <span className="w-full border-t border-gray-300 dark:border-gray-600" />
-          </div>
-          <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-white dark:bg-gray-900 px-2 text-gray-500 dark:text-gray-400">Or</span>
-          </div>
-        </div>
-
-        <div className="flex justify-center space-x-4 mt-6">
-          <Button variant="outline" size="icon" className="rounded-full w-10 h-10">
-            <Image src="/google.svg" alt="Google" width={20} height={20} />
-          </Button>
-          <Button variant="outline" size="icon" className="rounded-full w-10 h-10">
-            <Image src="/apple.svg" alt="Apple" width={20} height={20} />
-          </Button>
-        </div>
+        <SignIn 
+          path="/login"
+          routing="path"
+          signUpUrl="/signup"
+          appearance={{
+            elements: {
+              rootBox: "w-full",
+              card: "shadow-none border-0 p-0",
+              headerTitle: "hidden",
+              headerSubtitle: "hidden",
+              socialButtonsBlockButton: "border border-input hover:bg-accent",
+              formButtonPrimary: "bg-orange-600 hover:bg-orange-700",
+              footerActionText: "text-gray-600 dark:text-gray-300",
+              footerActionLink: "text-orange-600 hover:text-orange-800 dark:text-orange-400 dark:hover:text-orange-300"
+            }
+          }}
+        />
 
         <p className="text-center text-sm text-gray-600 dark:text-gray-400 mt-6">
           Don't have an account?{' '}

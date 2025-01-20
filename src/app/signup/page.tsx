@@ -1,7 +1,7 @@
 import { Metadata } from 'next'
 import Link from 'next/link'
 import Image from 'next/image'
-import { SignupForm } from '@/components/signup-form'
+import { SignUp } from '@clerk/nextjs'
 import { Button } from '@/components/ui/button'
 import { ArrowLeft } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
@@ -32,16 +32,23 @@ export default function SignupPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <SignupForm />
-
-            <div className="relative mt-6">
-              <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t border-gray-300 dark:border-gray-600" />
-              </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-white dark:bg-gray-900 px-2 text-gray-500 dark:text-gray-400">Or</span>
-              </div>
-            </div>
+            <SignUp 
+              path="/signup"
+              routing="path"
+              signInUrl="/login"
+              appearance={{
+                elements: {
+                  rootBox: "w-full",
+                  card: "shadow-none border-0 p-0",
+                  headerTitle: "hidden",
+                  headerSubtitle: "hidden",
+                  socialButtonsBlockButton: "border border-input hover:bg-accent",
+                  formButtonPrimary: "bg-orange-600 hover:bg-orange-700",
+                  footerActionText: "text-gray-600 dark:text-gray-300",
+                  footerActionLink: "text-orange-600 hover:text-orange-800 dark:text-orange-400 dark:hover:text-orange-300"
+                }
+              }}
+            />
 
             <p className="text-center text-sm text-gray-600 dark:text-gray-400 mt-6">
               Already have an account?{' '}
