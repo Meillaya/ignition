@@ -18,9 +18,7 @@ const isPublicRoute = createRouteMatcher([
 
 export default clerkMiddleware(async (auth, req) => {
   // Protect routes that require authentication
-  if (isProtectedRoute(req)) {
-    await auth().protect();
-  }
+  if (isProtectedRoute(req)) await auth.protect()
   
   // Allow public routes to bypass authentication
   if (isPublicRoute(req)) {
@@ -28,8 +26,8 @@ export default clerkMiddleware(async (auth, req) => {
   }
   
   // Redirect unauthenticated users to login page for other routes
-  if (!auth().userId) {
-    return auth().redirectToSignIn({ returnBackUrl: req.url });
+  if (!(await auth()).userId) {
+    return (await auth()).redirectToSignIn({ returnBackUrl: req.url });
   }
 });
 
