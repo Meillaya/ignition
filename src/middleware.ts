@@ -1,28 +1,12 @@
-import { NextResponse } from 'next/server'
-import { getToken } from 'next-auth/jwt'
-import type { NextRequest } from 'next/server'
+import { clerkMiddleware } from "@clerk/nextjs/server";
 
-const protectedRoutes = ['/dashboard']
-const publicRoutes = ['/login', '/signup']
-
-export async function middleware(request: NextRequest) {
-  const pathname = request.nextUrl.pathname
-  const token = await getToken({ req: request })
-
-  // Redirect logged-in users from public routes
-  if (publicRoutes.includes(pathname) && token) {
-    return NextResponse.redirect(new URL('/dashboard', request.url))
-  }
-
-  // Redirect unauthenticated users from protected routes
-  if (protectedRoutes.some(route => pathname.startsWith(route)) && !token) {
-    return NextResponse.redirect(new URL('/login', request.url))
-  }
-
-
-  return NextResponse.next()
-}
+export default clerkMiddleware();
 
 export const config = {
-  matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)'],
-}
+  matcher: [
+    // Skip Next.js internals and all static files, unless found in search params
+    '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
+    // Always run for API routes
+    '/(api|trpc)(.*)',
+  ],
+};
