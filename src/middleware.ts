@@ -2,15 +2,27 @@ import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
 
 const isProtectedRoute = createRouteMatcher([
   '/dashboard(.*)',
-  '/account(.*)',
-  // Exclude auth routes
-  '/((?!login|signup).*)'
+  '/account(.*)'
+]);
+
+const isPublicRoute = createRouteMatcher([
+  '/',
+  '/login(.*)',
+  '/signup(.*)',
+  '/api(.*)'
 ]);
 
 
 export default clerkMiddleware(async (auth, req) => {
-  if (isProtectedRoute(req)) await auth.protect()
-})
+  if (isProtectedRoute(req)) {
+    await auth().protect();
+  }
+  
+  // Allow public routes to bypass authentication
+  if (isPublicRoute(req)) {
+    return;
+  }
+});
 
 export const config = {
   matcher: [
