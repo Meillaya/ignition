@@ -1,8 +1,13 @@
 import type  { Metadata } from 'next'
 import { Geist } from 'next/font/google'
 import ClientLayout from './client-layout'
-import { ClerkProvider } from '@clerk/nextjs'
-import { auth } from '@clerk/nextjs/server'
+import {
+  ClerkProvider,
+  SignInButton,
+  SignedIn,
+  SignedOut,
+  UserButton
+} from '@clerk/nextjs'
 import './globals.css'
 const geist = Geist({
   subsets: ['latin'],
@@ -17,19 +22,18 @@ export const metadata: Metadata = {
   },
 }
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
-  const { userId } = auth();
   return (
     <ClerkProvider
       appearance={{
         variables: {
-          colorPrimary: '#ea580c',
+          colorPrimary: '#ea580c', // orange-600
           colorTextOnPrimaryBackground: '#fff',
-          colorTextSecondary: '#525252',
+          colorTextSecondary: '#525252', // neutral-600
           colorBackground: '#fff',
           colorInputBackground: '#fff',
           colorShimmer: 'rgba(255,255,255,0.36)'
@@ -44,10 +48,6 @@ export default async function RootLayout({
           footerActionLink: 'text-orange-600 hover:text-orange-800 dark:text-orange-400 dark:hover:text-orange-300'
         }
       }}
-      afterSignInUrl="/dashboard"
-      afterSignUpUrl="/dashboard"
-      signInUrl="/login"
-      signUpUrl="/signup"
     >
     <html lang="en" suppressHydrationWarning>
       <body className={`${geist.variable} font-sans antialiased`}>
