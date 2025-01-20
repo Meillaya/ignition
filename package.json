@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@clerk/nextjs": "^6.9.15",
     "@hookform/resolvers": "latest",
     "@radix-ui/react-accordion": "^1.2.2",
     "@radix-ui/react-alert-dialog": "^1.1.4",
@@ -57,7 +58,6 @@
     "firebase": "^11.1.0",
     "framer-motion": "latest",
     "input-otp": "1.4.1",
-    "install": "^0.13.0",
     "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.454.0",
     "micro": "^10.0.1",
