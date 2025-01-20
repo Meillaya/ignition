@@ -1,7 +1,14 @@
 import type  { Metadata } from 'next'
 import { Geist } from 'next/font/google'
 import ClientLayout from './client-layout'
-
+import {
+  ClerkProvider,
+  SignInButton,
+  SignedIn,
+  SignedOut,
+  UserButton
+} from '@clerk/nextjs'
+import './globals.css'
 const geist = Geist({
   subsets: ['latin'],
   variable: '--font-sans',
@@ -21,6 +28,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
+    <ClerkProvider>
     <html lang="en" suppressHydrationWarning>
       <body className={`${geist.variable} font-sans antialiased`}>
         <ClientLayout>
@@ -28,9 +36,10 @@ export default function RootLayout({
         </ClientLayout>
       </body>
     </html>
+    </ClerkProvider>
   )
 }
 
 
 
-import './globals.css'
+
