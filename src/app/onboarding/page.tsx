@@ -22,14 +22,19 @@ export default function OnboardingPage() {
       if (!user) throw new Error('No user found')
 
       // Update user profile with selected role
-      const { error } = await supabase
+      const { error: updateError } = await supabase
         .from('users')
         .update({ role: selectedRole })
         .eq('id', user.id)
 
-      if (error) throw error
+      if (updateError) throw updateError
+
+      // Refresh session to ensure cookies are updated
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+      if (sessionError || !session) throw new Error('Failed to get session')
 
       // Redirect to dashboard
+      router.refresh()
       router.push('/dashboard')
     } catch (error) {
       console.error('Error updating role:', error)

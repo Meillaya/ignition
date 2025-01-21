@@ -12,26 +12,36 @@ export async function GET(request: Request) {
     const supabase = await createClient()
     const { data, error } = await supabase.auth.exchangeCodeForSession(code)
     if (!error) {
+      // Ensure session cookies are set
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) throw new Error('Failed to get session')
+
       // Check if user needs onboarding
       const { data: profile } = await supabase
         .from('users')
         .select('role')
-        .eq('id', data.session?.user.id)
+        .eq('id', session.user.id)
         .single()
 
       // If no role is set, redirect to onboarding
       const redirectPath = !profile?.role ? '/onboarding' : next
 
-      const forwardedHost = request.headers.get('x-forwarded-host')
-      const isLocalEnv = process.env.NODE_ENV === 'development'
+      // Create response with cookies
+      const response = NextResponse.redirect(new URL(redirectPath, origin))
       
-      if (isLocalEnv) {
-        return NextResponse.redirect(`${origin}${redirectPath}`)
-      } else if (forwardedHost) {
-        return NextResponse.redirect(`https://${forwardedHost}${redirectPath}`)
-      } else {
-        return NextResponse.redirect(`${origin}${redirectPath}`)
-      }
+      // Set auth cookies
+      response.cookies.set('sb-access-token', session.access_token, {
+        path: '/',
+        sameSite: 'lax',
+        secure: process.env.NODE_ENV === 'production',
+      })
+      response.cookies.set('sb-refresh-token', session.refresh_token, {
+        path: '/',
+        sameSite: 'lax',
+        secure: process.env.NODE_ENV === 'production',
+      })
+
+      return response
     }
   }
 
