@@ -30,14 +30,22 @@ export default function OnboardingPage() {
 
       if (updateError) throw updateError
 
-      // Force refresh of NextAuth session
-      const session = await getSession()
-      if (!session) throw new Error('Failed to get session')
+      // Verify the role was updated in database
+      const { data: updatedUser } = await supabase
+        .from('users')
+        .select('role')
+        .eq('id', user.id)
+        .single();
 
-      // Force update of client-side session
-      const event = new Event('visibilitychange')
-      document.dispatchEvent(event)
-      router.push('/dashboard')
+      if (!updatedUser?.role) throw new Error('Role update failed');
+
+      // Get fresh auth state
+      const { data: { user: currentUser } } = await supabase.auth.getUser();
+      if (!currentUser) throw new Error('Failed to refresh auth state');
+
+      // Redirect and force client-side update
+      router.refresh();
+      router.push('/dashboard');
     } catch (error) {
       console.error('Error updating role:', error)
     } finally {
