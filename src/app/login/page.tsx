@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { signIn } from 'next-auth/react'
+import { createClient } from '@/utils/supabase/server'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
@@ -43,21 +43,26 @@ export default function LoginPage() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true)
     try {
-      const result = await signIn('credentials', {
-        redirect: false,
+      const supabase = createClient()
+      const { data, error } = await supabase.auth.signInWithPassword({
         email: values.email,
         password: values.password,
       })
 
-      if (result?.error) {
-        throw new Error(result.error)
+      if (error) {
+        throw error
       }
 
-      router.push('/dashboard')
-      toast({
-        title: "Welcome back!",
-        description: "Successfully logged in to your account.",
-      })
+      if (data.session) {
+        router.push('/dashboard')
+        router.refresh() // Ensure client-side state updates
+        toast({
+          title: "Welcome back!",
+          description: "Successfully logged in to your account.",
+        })
+      } else {
+        throw new Error('No session created')
+      }
     } catch (error) {
       toast({
         variant: "destructive",
