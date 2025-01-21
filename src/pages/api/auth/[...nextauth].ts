@@ -173,11 +173,34 @@ export default NextAuth({
       else if (new URL(url).origin === baseUrl) return url
       return baseUrl
     },
-    async signIn({ user }) {
-      if (user) {
-        return true
+    async signIn({ user, account }) {
+      if (account?.provider !== 'credentials' && user) {
+        // Handle OAuth user creation
+        const { data: existingUser } = await supabase
+          .from('users')
+          .select('id')
+          .eq('email', user.email)
+          .single();
+
+        if (!existingUser) {
+          // Create new user with OAuth info
+          const { error } = await supabase
+            .from('users')
+            .insert([{
+              id: user.id,
+              email: user.email,
+              // Role will be set during onboarding
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString()
+            }]);
+
+          if (error) {
+            console.error('Error creating user:', error);
+            return false;
+          }
+        }
       }
-      return false
-    }
+      return true;
+    },
   }
 });
