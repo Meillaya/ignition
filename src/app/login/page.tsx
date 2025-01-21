@@ -43,21 +43,16 @@ export default function LoginPage() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true)
     try {
-      const response = await fetch('/api/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(values),
-        credentials: 'same-origin'
+      const result = await signIn('credentials', {
+        redirect: false,
+        email: values.email,
+        password: values.password,
       })
 
-      if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.error || 'Login failed')
+      if (result?.error) {
+        throw new Error(result.error)
       }
 
-      // Redirect after successful login
       router.push('/dashboard')
       toast({
         title: "Welcome back!",
