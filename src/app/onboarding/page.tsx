@@ -29,12 +29,13 @@ export default function OnboardingPage() {
 
       if (updateError) throw updateError
 
-      // Refresh session to ensure cookies are updated
-      const { data: { session }, error: sessionError } = await supabase.auth.getSession()
-      if (sessionError || !session) throw new Error('Failed to get session')
+      // Force refresh of NextAuth session
+      const session = await getSession()
+      if (!session) throw new Error('Failed to get session')
 
-      // Redirect to dashboard
-      router.refresh()
+      // Force update of client-side session
+      const event = new Event('visibilitychange')
+      document.dispatchEvent(event)
       router.push('/dashboard')
     } catch (error) {
       console.error('Error updating role:', error)

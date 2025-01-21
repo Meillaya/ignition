@@ -137,10 +137,19 @@ export default NextAuth({
   useSecureCookies: process.env.NODE_ENV === 'production',
   callbacks: {
     async jwt({ token, user }) {
-      if (user) {
-        token.id = user.id;
-        token.role = user.role;
-        token.email = user.email;
+      // Always try to get fresh user data
+      if (token.email) {
+        const { data: freshUser } = await supabase
+          .from('users')
+          .select('id, email, role')
+          .eq('email', token.email)
+          .single();
+
+        if (freshUser) {
+          token.id = freshUser.id;
+          token.role = freshUser.role;
+          token.email = freshUser.email;
+        }
       }
       return token;
     },
