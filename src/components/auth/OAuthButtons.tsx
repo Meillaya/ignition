@@ -17,7 +17,7 @@ export function OAuthButtons({ isLoading }: OAuthButtonsProps) {
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
+          redirectTo: `${window.location.origin}/auth/callback?next=/onboarding`,
           queryParams: {
             access_type: 'offline',
             prompt: 'consent',
