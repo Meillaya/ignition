@@ -1,8 +1,7 @@
 import { Button } from "@/components/ui/button"
 import Image from "next/image"
-import { signIn } from "next-auth/react"
 import { useState } from "react"
-import { supabase } from '@/lib/supabaseClient'
+import { createClient } from '@/utils/supabase/client'
 
 interface OAuthButtonsProps {
   isLoading?: boolean
@@ -10,13 +9,26 @@ interface OAuthButtonsProps {
 
 export function OAuthButtons({ isLoading }: OAuthButtonsProps) {
   const [loadingProvider, setLoadingProvider] = useState<string | null>(null)
+  const supabase = createClient()
 
-  const handleOAuthSignIn = async (provider: string) => {
+  const handleOAuthSignIn = async (provider: 'google' | 'apple') => {
     try {
       setLoadingProvider(provider)
-      await signIn(provider, { callbackUrl: '/dashboard' })
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+          },
+        },
+      })
+
+      if (error) throw error
     } catch (error) {
       console.error(`Error signing in with ${provider}:`, error)
+      setLoadingProvider(null)
     }
   }
 
