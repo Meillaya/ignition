@@ -14,7 +14,7 @@ export async function GET(request: Request) {
     if (!error) {
       // Check if user needs onboarding
       const { data: profile } = await supabase
-        .from('profiles')
+        .from('users')
         .select('role')
         .eq('id', data.session?.user.id)
         .single()
