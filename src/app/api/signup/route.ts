@@ -2,38 +2,22 @@ import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabaseClient';
 import { hash } from 'bcryptjs';
 import { z } from 'zod';
-import rateLimit from '@/lib/rateLimit';
-
-// Rate limiting configuration
-const limiter = rateLimit({
-  interval: 60 * 1000, // 1 minute
-  uniqueTokenPerInterval: 500, // Max users per interval
-});
 
 const signupSchema = z.object({
   email: z.string().email(),
-  password: z.string()
-    .min(8)
-    .regex(/[A-Z]/, { message: "Must contain at least one uppercase letter" })
-    .regex(/[0-9]/, { message: "Must contain at least one number" })
-    .regex(/[^A-Za-z0-9]/, { message: "Must contain at least one special character" }),
+  password: z.string().min(8),
   role: z.enum(['client', 'contractor']),
 });
 
 export async function POST(request: Request) {
-  const ip = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip');
-  
   try {
-    // Apply rate limiting
-    await limiter.check(10, ip); // 10 requests per minute per IP
-
     const body = await request.json();
-    
     // Validate input
     const validatedData = signupSchema.safeParse(body);
     if (!validatedData.success) {
+      console.error('Validation error:', validatedData.error);
       return NextResponse.json(
-        { error: 'Invalid input data' },
+        { error: 'Invalid input data', details: validatedData.error.format() },
         { status: 400 }
       );
     }
@@ -53,36 +37,25 @@ export async function POST(request: Request) {
       );
     }
 
-    // Hash password with stronger salt
+    // Hash password
     const hashedPassword = await hash(password, 12);
 
-    // Create user in Supabase Auth
+    // First create user in Supabase Auth
     const { data: authData, error: authError } = await supabase.auth.signUp({
       email,
       password,
-      options: {
-        emailRedirectTo: `${process.env.NEXTAUTH_URL}/dashboard`,
-        data: {
-          role,
-        }
-      }
     });
 
     if (authError) {
-      return NextResponse.json(
-        { error: 'Authentication error' },
-        { status: 401 }
-      );
+      console.error('Supabase auth error:', authError);
+      throw new Error(authError.message);
     }
 
     if (!authData.user) {
-      return NextResponse.json(
-        { error: 'Failed to create user' },
-        { status: 500 }
-      );
+      throw new Error('Failed to create user in auth system');
     }
 
-    // Create user in database
+    // Then create user in users table
     const { data: newUser, error: insertError } = await supabase
       .from('users')
       .insert({
@@ -91,19 +64,24 @@ export async function POST(request: Request) {
         password: hashedPassword,
         role,
         created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-        email_verified: false
+        updated_at: new Date().toISOString()
       })
       .select()
       .single();
 
     if (insertError) {
+      console.error('Supabase insert error:', insertError);
+      throw new Error(insertError.message);
+    }
+
+    if (!newUser) {
       return NextResponse.json(
-        { error: 'Database error' },
+        { error: 'Failed to create user in database' },
         { status: 500 }
       );
     }
 
+    console.log('User created successfully:', newUser.id);
     return NextResponse.json({ 
       success: true,
       user: {
@@ -111,16 +89,7 @@ export async function POST(request: Request) {
         email: newUser.email,
         role: newUser.role
       }
-    }, { 
-      status: 201,
-      headers: {
-        'Content-Security-Policy': "default-src 'self'",
-        'Strict-Transport-Security': 'max-age=31536000; includeSubDomains',
-        'X-Content-Type-Options': 'nosniff',
-        'X-Frame-Options': 'DENY',
-        'X-XSS-Protection': '1; mode=block'
-      }
-    });
+    }, { status: 201 });
   } catch (error) {
     console.error('Signup error:', error);
     return NextResponse.json(

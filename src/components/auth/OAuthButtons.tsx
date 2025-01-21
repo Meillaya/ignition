@@ -22,11 +22,6 @@ export function OAuthButtons({ isLoading }: OAuthButtonsProps) {
             access_type: 'offline',
             prompt: 'consent',
           },
-          cookieOptions: {
-            path: '/',
-            sameSite: 'lax',
-            secure: process.env.NODE_ENV === 'production',
-          }
         },
       })
 
