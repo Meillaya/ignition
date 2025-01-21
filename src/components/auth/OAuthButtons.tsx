@@ -26,6 +26,26 @@ export function OAuthButtons({ isLoading }: OAuthButtonsProps) {
       })
 
       if (error) throw error
+
+      // After successful auth, check/create user in public.users table
+      const { data: { user } } = await supabase.auth.getUser()
+      
+      if (user) {
+        const { error: upsertError } = await supabase
+          .from('users')
+          .upsert({
+            id: user.id,
+            email: user.email,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          }, {
+            onConflict: 'id'
+          })
+
+        if (upsertError) {
+          console.error('Error upserting user:', upsertError)
+        }
+      }
     } catch (error) {
       console.error(`Error signing in with ${provider}:`, error)
       setLoadingProvider(null)
