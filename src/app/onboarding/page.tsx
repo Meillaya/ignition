@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/utils/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card'
+import { getSession } from 'next-auth/react'
 
 export default function OnboardingPage() {
   const [selectedRole, setSelectedRole] = useState<'client' | 'contractor' | null>(null)
