@@ -40,13 +40,13 @@ export default function LoginPage() {
     },
   })
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
+  function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true)
     try {
       const formData = new FormData()
       formData.append('email', values.email)
       formData.append('password', values.password)
-      await login(formData)
+      login(formData)
     } catch (error) {
       toast({
         variant: "destructive",
