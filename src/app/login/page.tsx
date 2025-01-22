@@ -36,7 +36,8 @@ export default function LoginPage() {
   // Check for existing session on mount
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (session?.user) {
+      // Only redirect if we're on the login page
+      if (session?.user && window.location.pathname === '/login') {
         router.refresh()
         router.push('/dashboard')
       }
