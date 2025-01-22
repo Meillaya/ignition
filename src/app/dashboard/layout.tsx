@@ -1,28 +1,35 @@
 "use client"
 
-import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 import { Sidebar } from '@/components/sidebar'
 import { Header } from '@/components/header'
+import { createClient } from '@/utils/supabase/client'
 
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  const { data: session, status } = useSession()
   const router = useRouter()
+  const supabase = createClient()
 
   useEffect(() => {
-    if (status === 'unauthenticated') {
-      router.push('/login')
-    } else if (status === 'authenticated' && !session?.user?.role) {
-      router.push('/onboarding')
+    const checkAuth = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      
+      if (!user) {
+        router.push('/login')
+      } else if (!user.user_metadata?.role) {
+        router.push('/onboarding')
+      }
     }
-  }, [status, session, router])
 
-  if (status === 'loading') {
+    checkAuth()
+  }, [router, supabase])
+
+  const { data: { user } } = supabase.auth.getUser()
+  if (!user) {
     return <div>Loading...</div>
   }
 
