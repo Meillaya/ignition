@@ -38,15 +38,23 @@ export default function LoginPage() {
     let isMounted = true
     
     const checkSession = async () => {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (user && isMounted) {
-        router.push('/dashboard')
+      // Only redirect if we're on the login page directly
+      if (window.location.pathname === '/login') {
+        const { data: { user } } = await supabase.auth.getUser()
+        if (user && isMounted) {
+          router.push('/dashboard')
+        }
       }
     }
-    checkSession()
+    
+    // Add a small delay to allow navigation to complete
+    const timeout = setTimeout(() => {
+      checkSession()
+    }, 100)
 
     return () => {
       isMounted = false
+      clearTimeout(timeout)
     }
   }, [])
 
