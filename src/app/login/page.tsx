@@ -20,6 +20,7 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { motion, AnimatePresence } from 'framer-motion'
+import { createClient } from '@/utils/supabase/client'
 
 const formSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
