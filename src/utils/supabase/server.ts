@@ -2,7 +2,7 @@ import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 
 export async function createClient() {
-  const cookieStore = cookies()
+  const cookieStore = await cookies()
   
   // Server client configured to validate and refresh sessions using
   // HttpOnly cookies for secure session storage

@@ -20,7 +20,6 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { motion, AnimatePresence } from 'framer-motion'
-import { createClient } from '@/utils/supabase/client'
 import { login } from './actions'
 
 const formSchema = z.object({

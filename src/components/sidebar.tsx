@@ -66,7 +66,7 @@ const getRoutes = (role: 'client' | 'contractor') => {
   ]
 }
 
-export function Sidebar() {
+export async function Sidebar() {
   const pathname = usePathname()
   const supabase = createClient()
   const router = useRouter()
