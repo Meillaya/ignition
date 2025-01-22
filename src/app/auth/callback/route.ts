@@ -36,7 +36,8 @@ export async function GET(request: Request) {
             id: session.user.id,
             email: session.user.email,
             password: '',
-            role: additionalData.role || 'client',
+            role: additionalData.role || 'client',  // Ensure default role
+            password: '',  // Add empty password for schema compliance
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString(),
             name: session.user.user_metadata?.full_name || null,

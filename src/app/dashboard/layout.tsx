@@ -15,28 +15,32 @@ export default function DashboardLayout({
   const router = useRouter()
   const supabase = createClient()
 
-  const [user, setUser] = useState<User|undefined>()
-  const [role, setRole] = useState<string|undefined>()
+  const [user, setUser] = useState<User|null>(null)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const fetchUserData = async () => {
       const { data: { user } } = await supabase.auth.getUser()
-      if (!user) return
-      
-      const { data: roleData } = await supabase
-        .from('users')
-        .select('role')
-        .eq('id', user.id)
-        .single()
-
       setUser(user)
-      setRole(roleData?.role)
+      
+      if (user) {
+        // Get role but don't block rendering
+        const { data: roleData } = await supabase
+          .from('users')
+          .select('role')
+          .eq('id', user.id)
+          .single()
+          
+        // Set default role if missing
+        setRole(roleData?.role || 'client')
+      }
+      setLoading(false)
     }
 
     fetchUserData()
   }, [])
 
-  if (user === undefined || role === undefined) {
+  if (loading) {
     return <div>Loading...</div>
   }
 
