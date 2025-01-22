@@ -15,8 +15,8 @@ export default function DashboardLayout({
   const router = useRouter()
   const supabase = createClient()
 
-  const [user, setUser] = useState<User|null>(null)
-  const [role, setRole] = useState<string|null>(null)
+  const [user, setUser] = useState<User|undefined>()
+  const [role, setRole] = useState<string|undefined>()
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -30,13 +30,13 @@ export default function DashboardLayout({
         .single()
 
       setUser(user)
-      setRole(roleData?.role || null)
+      setRole(roleData?.role)
     }
 
     fetchUserData()
-  }, []) // Empty dependency array runs only once
+  }, [])
 
-  if (!user || !role) {
+  if (user === undefined || role === undefined) {
     return <div>Loading...</div>
   }
 
