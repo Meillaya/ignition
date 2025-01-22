@@ -1,10 +1,11 @@
 "use client"
 
 import { useRouter } from 'next/navigation'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { Sidebar } from '@/components/sidebar'
 import { Header } from '@/components/header'
 import { createClient } from '@/utils/supabase/client'
+import { User } from '@supabase/supabase-js'
 
 export default function DashboardLayout({
   children,
@@ -28,9 +29,9 @@ export default function DashboardLayout({
 
       // Get role from dedicated roles table instead of user_metadata
       const { data: roleData } = await supabase
-        .from('roles')
+        .from('users')
         .select('role')
-        .eq('user_id', user.id)
+        .eq('id', user.id)
         .single()
 
       if (!roleData?.role) {
