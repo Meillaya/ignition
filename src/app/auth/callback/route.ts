@@ -51,9 +51,9 @@ export async function GET(request: Request) {
 
       // Redirect based on role
       const redirectPath = profile?.role === 'contractor' 
-        ? '/contractor/dashboard' 
+        ? '/dashboard' 
         : profile?.role === 'client'
-        ? '/client/dashboard'
+        ? '/dashboard'
         : '/onboarding'
 
       // Create response with cookies
