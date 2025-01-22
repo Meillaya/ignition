@@ -3,8 +3,6 @@
 import { ThemeProvider } from "../components/theme-provider"
 
 import { Toaster } from "../components/ui/toaster"
-import { SessionProvider } from 'next-auth/react'
-
 export default function ClientLayout({
   children,
 }: {
@@ -17,12 +15,8 @@ export default function ClientLayout({
       enableSystem
       disableTransitionOnChange
     >
-      <SessionProvider>
-
-          {children}
-          <Toaster />
-
-      </SessionProvider>
+      {children}
+      <Toaster />
     </ThemeProvider>
   )
 }
