@@ -56,20 +56,8 @@ export async function GET(request: Request) {
         ? '/dashboard'
         : '/onboarding'
 
-      // Create response with cookies
+      // Create redirect response - Supabase middleware will handle cookies automatically
       const response = NextResponse.redirect(new URL(redirectPath, origin))
-      
-      // Set auth cookies
-      response.cookies.set('sb-access-token', session.access_token, {
-        path: '/',
-        sameSite: 'lax',
-        secure: process.env.NODE_ENV === 'production',
-      })
-      response.cookies.set('sb-refresh-token', session.refresh_token, {
-        path: '/',
-        sameSite: 'lax',
-        secure: process.env.NODE_ENV === 'production',
-      })
 
       return response
     }

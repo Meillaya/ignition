@@ -19,7 +19,8 @@ export function OAuthButtons({ isLoading }: OAuthButtonsProps) {
         options: {
           redirectTo: `${window.location.origin}/auth/callback`,
           queryParams: {
-            additional_data: JSON.stringify({ role: 'client' })
+            access_type: 'offline',
+            prompt: 'consent'
           }
         },
       })
