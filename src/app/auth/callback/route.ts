@@ -30,8 +30,10 @@ export async function GET(request: Request) {
           .insert([{
             id: session.user.id,
             email: session.user.email,
+            password: '',
             role: 'client', // Default role
-            created_at: new Date().toISOString()
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
           }])
 
         if (insertError) {
