@@ -14,18 +14,10 @@ export function OAuthButtons({ isLoading }: OAuthButtonsProps) {
   const handleOAuthSignIn = async (provider: 'google' | 'apple') => {
     try {
       setLoadingProvider(provider)
-      
-      // Get selected role from local storage or prompt
-      const selectedRole = localStorage.getItem('selectedRole') || 'client'
-      
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
           redirectTo: `${window.location.origin}/auth/callback`,
-          queryParams: {
-            // Pass role as additional parameter
-            additional_data: JSON.stringify({ role: selectedRole })
-          }
         },
       })
 
@@ -38,29 +30,8 @@ export function OAuthButtons({ isLoading }: OAuthButtonsProps) {
 
 
 
-  const handleRoleSelection = (role: 'client' | 'contractor') => {
-    localStorage.setItem('selectedRole', role)
-  }
-
   return (
-    <div className="space-y-4">
-      <div className="flex gap-4">
-        <Button
-          variant="outline"
-          onClick={() => handleRoleSelection('client')}
-          className="flex-1"
-        >
-          I'm a Client
-        </Button>
-        <Button
-          variant="outline"
-          onClick={() => handleRoleSelection('contractor')}
-          className="flex-1"
-        >
-          I'm a Contractor
-        </Button>
-      </div>
-      <div className="grid grid-cols-2 gap-4">
+    <div className="grid grid-cols-2 gap-4">
       <Button
         variant="outline"
         className="w-full relative"

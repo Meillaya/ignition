@@ -21,28 +21,11 @@ export default function OnboardingPage() {
       // Get current user
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) throw new Error('No user found')
-
-      // Update user profile with selected role
-      const { error: updateError } = await supabase
-        .from('users')
-        .update({ role: selectedRole })
-        .eq('id', user.id)
-
-      if (updateError) throw updateError
-
-      // Verify the role was updated in database
-      const { data: updatedUser } = await supabase
-        .from('users')
-        .select('role')
-        .eq('id', user.id)
-        .single();
-
-      if (!updatedUser?.role) throw new Error('Role update failed');
-
+      
       // Get fresh auth state
       const { data: { user: currentUser } } = await supabase.auth.getUser();
       if (!currentUser) throw new Error('Failed to refresh auth state');
-
+      
       // Redirect and force client-side update
       router.refresh();
       router.push('/dashboard');
