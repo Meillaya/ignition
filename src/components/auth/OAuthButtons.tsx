@@ -11,13 +11,19 @@ export function OAuthButtons({ isLoading }: OAuthButtonsProps) {
   const [loadingProvider, setLoadingProvider] = useState<string | null>(null)
   const supabase = createClient()
 
+  async function handleSignInWithGoogle(response: { credential: any }) {
+    const { data, error } = await supabase.auth.signInWithIdToken({
+      provider: 'google',
+      token: response.credential,
+    })
+  }
   const handleOAuthSignIn = async (provider: 'google' | 'apple') => {
     try {
       setLoadingProvider(provider)
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
-          redirectTo: `${window.location.origin}/auth/callback?next=/onboarding`,
+          redirectTo: `${window.location.origin}/auth/callback`,
           queryParams: {
             access_type: 'offline',
             prompt: 'consent',
@@ -26,31 +32,13 @@ export function OAuthButtons({ isLoading }: OAuthButtonsProps) {
       })
 
       if (error) throw error
-
-      // After successful auth, check/create user in public.users table
-      const { data: { user } } = await supabase.auth.getUser()
-      
-      if (user) {
-        const { error: upsertError } = await supabase
-          .from('users')
-          .upsert({
-            id: user.id,
-            email: user.email,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-          }, {
-            onConflict: 'id'
-          })
-
-        if (upsertError) {
-          console.error('Error upserting user:', upsertError)
-        }
-      }
     } catch (error) {
       console.error(`Error signing in with ${provider}:`, error)
       setLoadingProvider(null)
     }
   }
+
+
 
   return (
     <div className="grid grid-cols-2 gap-4">
