@@ -35,28 +35,15 @@ export default function LoginPage() {
 
   // Check for existing session on mount
   useEffect(() => {
-    let isMounted = true
-    
-    const checkSession = async () => {
-      // Only redirect if we're on the login page directly
-      if (window.location.pathname === '/login') {
-        const { data: { user } } = await supabase.auth.getUser()
-        if (user && isMounted) {
-          router.push('/dashboard')
-        }
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (session?.user) {
+        router.refresh()
+        router.push('/dashboard')
       }
-    }
-    
-    // Add a small delay to allow navigation to complete
-    const timeout = setTimeout(() => {
-      checkSession()
-    }, 100)
+    })
 
-    return () => {
-      isMounted = false
-      clearTimeout(timeout)
-    }
-  }, [])
+    return () => subscription?.unsubscribe()
+  }, [router])
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -150,6 +137,7 @@ export default function LoginPage() {
                   type="submit"
                   className="w-full"
                   disabled={isLoading}
+                  aria-disabled={isLoading}
                 >
                   {isLoading ? (
                     <div className="flex items-center gap-2">
