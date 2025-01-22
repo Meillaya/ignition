@@ -21,7 +21,6 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { motion, AnimatePresence } from 'framer-motion'
-import { login } from './actions'
 
 const formSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
@@ -53,13 +52,21 @@ export default function LoginPage() {
     },
   })
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true)
     try {
-      const formData = new FormData()
-      formData.append('email', values.email)
-      formData.append('password', values.password)
-      login(formData)
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: values.email,
+        password: values.password,
+      })
+
+      if (error) {
+        throw error
+      }
+
+      if (data?.user) {
+        router.push('/dashboard')
+      }
     } catch (error) {
       toast({
         variant: "destructive",
