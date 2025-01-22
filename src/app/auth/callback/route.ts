@@ -16,15 +16,32 @@ export async function GET(request: Request) {
       const { data: { session } } = await supabase.auth.getSession()
       if (!session) throw new Error('Failed to get session')
 
-      // Check if user needs onboarding
-      const { data: profile } = await supabase
+      // Check if user exists in profiles table
+      const { data: profile, error: profileError } = await supabase
         .from('users')
-        .select('role')
+        .select('*')
         .eq('id', session.user.id)
         .single()
 
-      // If no role is set, redirect to onboarding
-      const redirectPath = !profile?.role ? '/onboarding' : next
+      // If user doesn't exist, create profile with default role
+      if (!profile || profileError?.code === 'PGRST116') {
+        const { error: insertError } = await supabase
+          .from('users')
+          .insert([{
+            id: session.user.id,
+            email: session.user.email,
+            role: 'client', // Default role
+            created_at: new Date().toISOString()
+          }])
+
+        if (insertError) {
+          console.error('Error creating user profile:', insertError)
+          return NextResponse.redirect(`${origin}/auth/auth-code-error?error=profile_creation_failed`)
+        }
+      }
+
+      // Redirect to onboarding if no role is set
+      const redirectPath = profile?.role ? next : '/onboarding'
 
       // Create response with cookies
       const response = NextResponse.redirect(new URL(redirectPath, origin))
