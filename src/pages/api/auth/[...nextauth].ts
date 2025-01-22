@@ -173,29 +173,47 @@ export default NextAuth({
       else if (new URL(url).origin === baseUrl) return url
       return baseUrl
     },
-    async signIn({ user, account }) {
+    async signIn({ user, account, profile }) {
       if (account?.provider !== 'credentials' && user) {
         // Handle OAuth user creation
         const { data: existingUser } = await supabase
           .from('users')
-          .select('id')
+          .select('id, role')
           .eq('email', user.email)
           .single();
 
         if (!existingUser) {
+          // Get role from additional data or default to 'client'
+          const additionalData = account?.additional_data 
+            ? JSON.parse(account.additional_data)
+            : { role: 'client' };
+
           // Create new user with OAuth info
           const { error } = await supabase
             .from('users')
             .insert([{
               id: user.id,
               email: user.email,
-              // Role will be set during onboarding
+              role: additionalData.role || 'client',
               created_at: new Date().toISOString(),
-              updated_at: new Date().toISOString()
+              updated_at: new Date().toISOString(),
+              name: profile?.name || null,
+              image: profile?.picture || null
             }]);
 
           if (error) {
             console.error('Error creating user:', error);
+            return false;
+          }
+        } else if (!existingUser.role) {
+          // Update existing user with default role if missing
+          const { error } = await supabase
+            .from('users')
+            .update({ role: 'client' })
+            .eq('id', existingUser.id);
+
+          if (error) {
+            console.error('Error updating user role:', error);
             return false;
           }
         }
