@@ -23,17 +23,24 @@ export async function GET(request: Request) {
         .eq('id', session.user.id)
         .single()
 
-      // If user doesn't exist, create profile with default role
+      // If user doesn't exist, create profile with role from additional data
       if (!profile || profileError?.code === 'PGRST116') {
+        // Get additional data from URL params
+        const additionalData = searchParams.get('additional_data')
+          ? JSON.parse(searchParams.get('additional_data')!)
+          : { role: 'client' }
+
         const { error: insertError } = await supabase
           .from('users')
           .insert([{
             id: session.user.id,
             email: session.user.email,
             password: '',
-            role: 'client', // Default role
+            role: additionalData.role || 'client',
             created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
+            updated_at: new Date().toISOString(),
+            name: session.user.user_metadata?.full_name || null,
+            avatar_url: session.user.user_metadata?.avatar_url || null
           }])
 
         if (insertError) {
@@ -42,8 +49,12 @@ export async function GET(request: Request) {
         }
       }
 
-      // Redirect to onboarding if no role is set
-      const redirectPath = profile?.role ? next : '/onboarding'
+      // Redirect based on role
+      const redirectPath = profile?.role === 'contractor' 
+        ? '/contractor/dashboard' 
+        : profile?.role === 'client'
+        ? '/client/dashboard'
+        : '/onboarding'
 
       // Create response with cookies
       const response = NextResponse.redirect(new URL(redirectPath, origin))
@@ -64,6 +75,15 @@ export async function GET(request: Request) {
     }
   }
 
-  // return the user to an error page with instructions
-  return NextResponse.redirect(`${origin}/auth/auth-code-error`)
+  // Handle error cases
+  const error = searchParams.get('error')
+  const errorDescription = searchParams.get('error_description')
+  
+  if (error) {
+    console.error('OAuth Error:', error, errorDescription)
+    return NextResponse.redirect(`${origin}/auth/auth-code-error?error=${error}`)
+  }
+
+  // If no code, redirect to error page
+  return NextResponse.redirect(`${origin}/auth/auth-code-error?error=no_code`)
 }
