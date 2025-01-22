@@ -3,7 +3,6 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { signIn } from 'next-auth/react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
@@ -43,17 +42,17 @@ export default function LoginPage() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true)
     try {
-      const result = await signIn('credentials', {
-        redirect: false,
+      const supabase = createClient()
+      const { error } = await supabase.auth.signInWithPassword({
         email: values.email,
         password: values.password,
       })
 
-      if (result?.error) {
-        throw new Error(result.error)
+      if (error) {
+        throw new Error(error.message)
       }
 
-      router.push('/dashboard')
+      router.refresh()
       toast({
         title: "Welcome back!",
         description: "Successfully logged in to your account.",

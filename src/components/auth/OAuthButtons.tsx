@@ -18,6 +18,9 @@ export function OAuthButtons({ isLoading }: OAuthButtonsProps) {
         provider,
         options: {
           redirectTo: `${window.location.origin}/auth/callback`,
+          queryParams: {
+            additional_data: JSON.stringify({ role: 'client' })
+          }
         },
       })
 
