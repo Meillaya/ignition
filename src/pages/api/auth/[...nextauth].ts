@@ -158,21 +158,37 @@ export default NextAuth({
   },
   useSecureCookies: process.env.NODE_ENV === 'production',
   callbacks: {
-    async jwt({ token, user }) {
-      // Always try to get fresh user data
+    async jwt({ token, user, account, profile }) {
+      // Initial sign in
+      if (account && user) {
+        return {
+          ...token,
+          id: user.id,
+          email: user.email,
+          role: user.role || 'client',
+          accessToken: account.access_token,
+          refreshToken: account.refresh_token
+        }
+      }
+
+      // Subsequent requests - refresh user data
       if (token.email) {
-        const { data: freshUser } = await supabase
+        const { data: freshUser, error } = await supabase
           .from('users')
           .select('id, email, role')
           .eq('email', token.email)
           .single();
 
-        if (freshUser) {
-          token.id = freshUser.id;
-          token.role = freshUser.role;
-          token.email = freshUser.email;
+        if (!error && freshUser) {
+          return {
+            ...token,
+            id: freshUser.id,
+            email: freshUser.email,
+            role: freshUser.role
+          }
         }
       }
+
       return token;
     },
     async session({ session, token }) {
@@ -180,6 +196,9 @@ export default NextAuth({
         session.user.id = token.id;
         session.user.role = token.role;
         session.user.email = token.email;
+        session.accessToken = token.accessToken;
+        session.refreshToken = token.refreshToken;
+        session.error = token.error;
       }
       return session;
     },

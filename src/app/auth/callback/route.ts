@@ -12,16 +12,30 @@ export async function GET(request: Request) {
     const supabase = await createClient()
     const { data, error } = await supabase.auth.exchangeCodeForSession(code)
     if (!error) {
-      // Ensure session cookies are set
-      const { data: { session } } = await supabase.auth.getSession()
-      if (!session) throw new Error('Failed to get session')
+      // Ensure session is valid
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+      if (!session || sessionError) {
+        console.error('Session error:', sessionError)
+        return NextResponse.redirect(`${origin}/auth/auth-code-error?error=session_error`)
+      }
 
-      // Check if user exists in profiles table
+      // Verify user exists and has valid role
       const { data: profile, error: profileError } = await supabase
         .from('users')
-        .select('*')
+        .select('id, role, email')
         .eq('id', session.user.id)
         .single()
+
+      if (profileError || !profile) {
+        console.error('Profile error:', profileError)
+        return NextResponse.redirect(`${origin}/auth/auth-code-error?error=profile_error`)
+      }
+
+      // Ensure role is valid
+      if (!['client', 'contractor'].includes(profile.role)) {
+        console.error('Invalid role:', profile.role)
+        return NextResponse.redirect(`${origin}/auth/auth-code-error?error=invalid_role`)
+      }
 
       // If user doesn't exist, create profile with role from additional data
       if (!profile || profileError?.code === 'PGRST116') {
