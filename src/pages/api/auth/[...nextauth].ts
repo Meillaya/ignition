@@ -150,7 +150,7 @@ export default NextAuth({
   session: {
     strategy: 'jwt',
     maxAge: 30 * 24 * 60 * 60, // 30 days
-    updateAge: 24 * 60 * 60, // 24 hours
+    updateAge: 0, // Always check for fresh session
   },
   jwt: {
     secret: process.env.NEXTAUTH_SECRET,
@@ -192,15 +192,29 @@ export default NextAuth({
       return token;
     },
     async session({ session, token }) {
-      if (token && session.user) {
-        session.user.id = token.id;
-        session.user.role = token.role;
-        session.user.email = token.email;
+      // Always return fresh session data
+      if (token) {
+        session.user = {
+          ...session.user,
+          id: token.id,
+          role: token.role,
+          email: token.email
+        };
         session.accessToken = token.accessToken;
         session.refreshToken = token.refreshToken;
         session.error = token.error;
       }
-      return session;
+      
+      // Add cache control headers
+      const response = {
+        ...session,
+        headers: {
+          'Cache-Control': 'no-store, max-age=0',
+          'Pragma': 'no-cache'
+        }
+      };
+      
+      return response;
     },
     async redirect({ url, baseUrl }) {
       // Allows relative callback URLs
