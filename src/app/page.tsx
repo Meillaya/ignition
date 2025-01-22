@@ -42,12 +42,12 @@ export default function LandingPage() {
               >
                 How It Works
               </Link>
-              {/* <Link 
+              <Link 
                 href="#about" 
                 className="text-gray-700 dark:text-gray-300 hover:text-orange-600 transition-colors duration-200"
               >
                 About
-              </Link> */}
+              </Link>
             </div>
 
             {/* ModeToggle and CTA Button */}
@@ -57,7 +57,7 @@ export default function LandingPage() {
                 asChild
                 className="bg-white dark:bg-orange-600 text-orange-600 dark:text-white hover:bg-orange-50 dark:hover:bg-orange-700 rounded-full px-6"
               >
-                <Link href="/login">Login</Link>
+                <Link href="/contact">Contact Us</Link>
               </Button>
             </div>
           </div>

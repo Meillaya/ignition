@@ -74,23 +74,6 @@ export default NextAuth({
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-      authorization: {
-        params: {
-          prompt: 'consent',
-          access_type: 'offline',
-          response_type: 'code',
-          scope: 'openid profile email',
-        },
-      },
-      profile(profile) {
-        return {
-          id: profile.sub,
-          name: profile.name,
-          email: profile.email,
-          image: profile.picture,
-          role: 'client' // Default role, can be updated later
-        }
-      }
     }),
     CredentialsProvider({
       name: 'Credentials',
@@ -150,7 +133,7 @@ export default NextAuth({
   session: {
     strategy: 'jwt',
     maxAge: 30 * 24 * 60 * 60, // 30 days
-    updateAge: 0, // Always check for fresh session
+    updateAge: 24 * 60 * 60, // 24 hours
   },
   jwt: {
     secret: process.env.NEXTAUTH_SECRET,
@@ -158,63 +141,30 @@ export default NextAuth({
   },
   useSecureCookies: process.env.NODE_ENV === 'production',
   callbacks: {
-    async jwt({ token, user, account, profile }) {
-      // Initial sign in
-      if (account && user) {
-        return {
-          ...token,
-          id: user.id,
-          email: user.email,
-          role: user.role || 'client',
-          accessToken: account.access_token,
-          refreshToken: account.refresh_token
-        }
-      }
-
-      // Subsequent requests - refresh user data
+    async jwt({ token, user }) {
+      // Always try to get fresh user data
       if (token.email) {
-        const { data: freshUser, error } = await supabase
+        const { data: freshUser } = await supabase
           .from('users')
           .select('id, email, role')
           .eq('email', token.email)
           .single();
 
-        if (!error && freshUser) {
-          return {
-            ...token,
-            id: freshUser.id,
-            email: freshUser.email,
-            role: freshUser.role
-          }
+        if (freshUser) {
+          token.id = freshUser.id;
+          token.role = freshUser.role;
+          token.email = freshUser.email;
         }
       }
-
       return token;
     },
     async session({ session, token }) {
-      // Always return fresh session data
-      if (token) {
-        session.user = {
-          ...session.user,
-          id: token.id,
-          role: token.role,
-          email: token.email
-        };
-        session.accessToken = token.accessToken;
-        session.refreshToken = token.refreshToken;
-        session.error = token.error;
+      if (token && session.user) {
+        session.user.id = token.id;
+        session.user.role = token.role;
+        session.user.email = token.email;
       }
-      
-      // Add cache control headers
-      const response = {
-        ...session,
-        headers: {
-          'Cache-Control': 'no-store, max-age=0',
-          'Pragma': 'no-cache'
-        }
-      };
-      
-      return response;
+      return session;
     },
     async redirect({ url, baseUrl }) {
       // Allows relative callback URLs
@@ -223,47 +173,29 @@ export default NextAuth({
       else if (new URL(url).origin === baseUrl) return url
       return baseUrl
     },
-    async signIn({ user, account, profile }) {
+    async signIn({ user, account }) {
       if (account?.provider !== 'credentials' && user) {
         // Handle OAuth user creation
         const { data: existingUser } = await supabase
           .from('users')
-          .select('id, role')
+          .select('id')
           .eq('email', user.email)
           .single();
 
         if (!existingUser) {
-          // Get role from additional data or default to 'client'
-          const additionalData = account?.additional_data 
-            ? JSON.parse(account.additional_data)
-            : { role: 'client' };
-
           // Create new user with OAuth info
           const { error } = await supabase
             .from('users')
             .insert([{
               id: user.id,
               email: user.email,
-              role: additionalData.role || 'client',
+              // Role will be set during onboarding
               created_at: new Date().toISOString(),
-              updated_at: new Date().toISOString(),
-              name: profile?.name || null,
-              image: profile?.picture || null
+              updated_at: new Date().toISOString()
             }]);
 
           if (error) {
             console.error('Error creating user:', error);
-            return false;
-          }
-        } else if (!existingUser.role) {
-          // Update existing user with default role if missing
-          const { error } = await supabase
-            .from('users')
-            .update({ role: 'client' })
-            .eq('id', existingUser.id);
-
-          if (error) {
-            console.error('Error updating user role:', error);
             return false;
           }
         }

@@ -17,18 +17,40 @@ export function OAuthButtons({ isLoading }: OAuthButtonsProps) {
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
+          redirectTo: `${window.location.origin}/auth/callback?next=/onboarding`,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+          },
         },
       })
 
       if (error) throw error
+
+      // After successful auth, check/create user in public.users table
+      const { data: { user } } = await supabase.auth.getUser()
+      
+      if (user) {
+        const { error: upsertError } = await supabase
+          .from('users')
+          .upsert({
+            id: user.id,
+            email: user.email,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          }, {
+            onConflict: 'id'
+          })
+
+        if (upsertError) {
+          console.error('Error upserting user:', upsertError)
+        }
+      }
     } catch (error) {
       console.error(`Error signing in with ${provider}:`, error)
       setLoadingProvider(null)
     }
   }
-
-
 
   return (
     <div className="grid grid-cols-2 gap-4">

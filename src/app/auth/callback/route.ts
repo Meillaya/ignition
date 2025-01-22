@@ -16,45 +16,15 @@ export async function GET(request: Request) {
       const { data: { session } } = await supabase.auth.getSession()
       if (!session) throw new Error('Failed to get session')
 
-      // Check if user exists in profiles table
-      const { data: profile, error: profileError } = await supabase
+      // Check if user needs onboarding
+      const { data: profile } = await supabase
         .from('users')
-        .select('*')
+        .select('role')
         .eq('id', session.user.id)
         .single()
 
-      // If user doesn't exist, create profile with role from additional data
-      if (!profile || profileError?.code === 'PGRST116') {
-        // Get additional data from URL params
-        const additionalData = searchParams.get('additional_data')
-          ? JSON.parse(searchParams.get('additional_data')!)
-          : { role: 'client' }
-
-        const { error: insertError } = await supabase
-          .from('users')
-          .insert([{
-            id: session.user.id,
-            email: session.user.email,
-            password: '',
-            role: additionalData.role || 'client',
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-            name: session.user.user_metadata?.full_name || null,
-            avatar_url: session.user.user_metadata?.avatar_url || null
-          }])
-
-        if (insertError) {
-          console.error('Error creating user profile:', insertError)
-          return NextResponse.redirect(`${origin}/auth/auth-code-error?error=profile_creation_failed`)
-        }
-      }
-
-      // Redirect based on role
-      const redirectPath = profile?.role === 'contractor' 
-        ? '/dashboard' 
-        : profile?.role === 'client'
-        ? '/dashboard'
-        : '/onboarding'
+      // If no role is set, redirect to onboarding
+      const redirectPath = !profile?.role ? '/onboarding' : next
 
       // Create response with cookies
       const response = NextResponse.redirect(new URL(redirectPath, origin))
@@ -75,15 +45,6 @@ export async function GET(request: Request) {
     }
   }
 
-  // Handle error cases
-  const error = searchParams.get('error')
-  const errorDescription = searchParams.get('error_description')
-  
-  if (error) {
-    console.error('OAuth Error:', error, errorDescription)
-    return NextResponse.redirect(`${origin}/auth/auth-code-error?error=${error}`)
-  }
-
-  // If no code, redirect to error page
-  return NextResponse.redirect(`${origin}/auth/auth-code-error?error=no_code`)
+  // return the user to an error page with instructions
+  return NextResponse.redirect(`${origin}/auth/auth-code-error`)
 }
