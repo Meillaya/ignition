@@ -17,8 +17,7 @@ import {
   Briefcase,
   CalendarCheck
 } from 'lucide-react'
-import { signOut } from 'next-auth/react'
-import { useSession } from 'next-auth/react'
+import { createClient } from '@/utils/supabase/client'
 import Image from 'next/image'
 
 const getRoutes = (role: 'client' | 'contractor') => {
@@ -69,19 +68,20 @@ const getRoutes = (role: 'client' | 'contractor') => {
 
 export function Sidebar() {
   const pathname = usePathname()
-  const { data: session } = useSession()
+  const supabase = createClient()
   const router = useRouter()
 
   const handleLogout = async () => {
-    await signOut({ redirect: false })
+    await supabase.auth.signOut()
     router.push('/login')
   }
 
-  if (!session?.user) {
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) {
     return null
   }
 
-  const routes = getRoutes(session.user.role)
+  const routes = getRoutes(user.user_metadata?.role || 'client')
 
   return (
     <div className="flex h-full w-64 flex-col border-r bg-background">
@@ -117,8 +117,8 @@ export function Sidebar() {
       <div className="border-t p-4">
         <div className="mb-4 px-2 text-sm text-muted-foreground">
           <p>Logged in as:</p>
-          <p className="font-medium">{session.user.email}</p>
-          <p className="capitalize">({session.user.role})</p>
+          <p className="font-medium">{user.email}</p>
+          <p className="capitalize">({user.user_metadata?.role})</p>
         </div>
         <Button 
           variant="outline" 
