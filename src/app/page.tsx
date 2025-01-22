@@ -57,7 +57,7 @@ export default function LandingPage() {
                 asChild
                 className="bg-white dark:bg-orange-600 text-orange-600 dark:text-white hover:bg-orange-50 dark:hover:bg-orange-700 rounded-full px-6"
               >
-                <Link href="/contact">Contact Us</Link>
+                <Link href="/login">Login</Link>
               </Button>
             </div>
           </div>
