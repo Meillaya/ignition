@@ -35,13 +35,19 @@ export default function LoginPage() {
 
   // Check for existing session on mount
   useEffect(() => {
+    let isMounted = true
+    
     const checkSession = async () => {
       const { data: { user } } = await supabase.auth.getUser()
-      if (user) {
+      if (user && isMounted) {
         router.push('/dashboard')
       }
     }
     checkSession()
+
+    return () => {
+      isMounted = false
+    }
   }, [])
 
   const form = useForm<z.infer<typeof formSchema>>({
