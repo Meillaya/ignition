@@ -1,5 +1,6 @@
 "use client"
 
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { cn } from '@/lib/utils'
@@ -66,17 +67,25 @@ const getRoutes = (role: 'client' | 'contractor') => {
   ]
 }
 
-export async function Sidebar() {
+export function Sidebar() {
   const pathname = usePathname()
   const supabase = createClient()
   const router = useRouter()
+  const [user, setUser] = useState(null)
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      setUser(user)
+    }
+    fetchUser()
+  }, [])
 
   const handleLogout = async () => {
     await supabase.auth.signOut()
     router.push('/login')
   }
 
-  const { data: { user } } = await supabase.auth.getUser()
   if (!user) {
     return null
   }
