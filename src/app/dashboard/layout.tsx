@@ -19,15 +19,17 @@ export default function DashboardLayout({
   const [role, setRole] = useState<string|null>(null)
 
   useEffect(() => {
+    let isMounted = true
     const checkAuth = async () => {
       const { data: { user } } = await supabase.auth.getUser()
+      
+      if (!isMounted) return
       
       if (!user) {
         router.push('/login')
         return
       }
 
-      // Get role from dedicated roles table instead of user_metadata
       const { data: roleData } = await supabase
         .from('users')
         .select('role')
@@ -39,12 +41,15 @@ export default function DashboardLayout({
         return
       }
 
-      setUser(user)
-      setRole(roleData.role)
+      if (isMounted) {
+        setUser(user)
+        setRole(roleData.role)
+      }
     }
 
     checkAuth()
-  }, [router, supabase])
+    return () => { isMounted = false }
+  }, [router]) // Removed supabase from dependencies as it's stable
 
   if (!user) {
     return <div>Loading...</div>
