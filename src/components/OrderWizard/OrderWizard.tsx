@@ -1,37 +1,36 @@
 "use client"
 
-import React, { createContext, useContext, useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
-import { createOrder } from '@/lib/api/orders'
-import { useToast } from '@/components/ui/use-toast'
-import { motion, AnimatePresence } from 'framer-motion'
-import { OrderDetails, WizardContextType, PricingInfo } from '@/types/wizard'
-import { Button } from '@/components/ui/button'
-import { Progress } from '@/components/ui/progress'
-import WasteTypeStep from './steps/WasteTypeStep'
-import BinSizeStep from './steps/BinSizeStep'
-import BinPlacementStep from './steps/BinPlacementStep'
-import ContactInfoStep from './steps/ContactInfoStep'
-import PaymentStep from './steps/PaymentStep'
-import { CurrentCost } from './CurrentCost'
-import { Card, CardContent } from '@/components/ui/card'
+import type React from "react"
+import { createContext, useContext, useState, useEffect } from "react"
+import { motion, AnimatePresence } from "framer-motion"
+import type { OrderDetails, WizardContextType, PricingInfo } from "@/types/wizard"
+import { Button } from "@/components/ui/button"
+import { Progress } from "@/components/ui/progress"
+import WasteTypeStep from "./steps/WasteTypeStep"
+import BinSizeStep from "./steps/BinSizeStep"
+import BinPlacementStep from "./steps/BinPlacementStep"
+import ContactInfoStep from "./steps/ContactInfoStep"
+import ScheduleStep from "./steps/ScheduleStep"
+import ReviewStep from "./steps/ReviewStep"
+import { CurrentCost } from "./CurrentCost"
+import { Card, CardContent } from "@/components/ui/card"
 
 const WizardContext = createContext<WizardContextType | undefined>(undefined)
 
 export const useWizard = () => {
   const context = useContext(WizardContext)
   if (!context) {
-    throw new Error('useWizard must be used within a WizardProvider')
+    throw new Error("useWizard must be used within a WizardProvider")
   }
   return context
 }
 
 const pricingInfo: PricingInfo = {
   basePrices: {
-    '6': 200,
-    '8': 250,
-    '10': 300,
-    '14': 350,
+    "6": 200,
+    "8": 250,
+    "10": 300,
+    "14": 350,
   },
   wasteTypeMultipliers: {
     mixed_garbage: 1.2,
@@ -50,74 +49,35 @@ const pricingInfo: PricingInfo = {
 }
 
 const OrderWizard: React.FC = () => {
-  const router = useRouter()
-  const { toast } = useToast()
   const [currentStep, setCurrentStep] = useState(1)
-  const [orderDetails, setOrderDetails] = useState<OrderDetails>({
-    wasteType: null,
-    binSize: null,
-    binPlacement: null,
-    address: '',
-    deliveryDate: '',
-    contactName: '',
-    contactPhone: '',
-    contactEmail: '',
-  })
+  const [orderDetails, setOrderDetails] = useState<Partial<OrderDetails>>({})
 
   const updateOrderDetails = (details: Partial<OrderDetails>) => {
     setOrderDetails((prev) => ({ ...prev, ...details }))
   }
 
-  const nextStep = () => setCurrentStep((prev) => Math.min(prev + 1, 5))
+  const nextStep = () => setCurrentStep((prev) => Math.min(prev + 1, steps.length))
   const prevStep = () => setCurrentStep((prev) => Math.max(prev - 1, 1))
   const goToStep = (step: number) => setCurrentStep(step)
 
-  const [isCalculating, setIsCalculating] = useState(false)
-  const [totalCost, setTotalCost] = useState(0)
-  const [costBreakdown, setCostBreakdown] = useState({
-    basePrice: 0,
-    wasteMultiplier: 1,
-    placementFee: 0
-  })
-
   const calculateTotalCost = () => {
-    setIsCalculating(true)
-    
-    try {
-      let basePrice = 0
-      let wasteMultiplier = 1
-      let placementFee = 0
-      
-      if (!orderDetails.binSize) {
-        throw new Error('Please select a bin size')
-      }
-      
-      basePrice = pricingInfo.basePrices[orderDetails.binSize]
-      
-      if (orderDetails.wasteType) {
-        wasteMultiplier = pricingInfo.wasteTypeMultipliers[orderDetails.wasteType]
-      }
-      
-      if (orderDetails.binPlacement) {
-        placementFee = pricingInfo.placementFees[orderDetails.binPlacement]
-      }
-      
-      const total = (basePrice * wasteMultiplier) + placementFee
-      
-      setCostBreakdown({
-        basePrice,
-        wasteMultiplier,
-        placementFee
-      })
-      
-      return parseFloat(total.toFixed(2))
-    } catch (error) {
-      console.error('Error calculating cost:', error)
-      return 0
-    } finally {
-      setIsCalculating(false)
+    let total = 0
+    if (orderDetails.binSize) {
+      total += pricingInfo.basePrices[orderDetails.binSize]
     }
+    if (orderDetails.wasteType) {
+      total *= pricingInfo.wasteTypeMultipliers[orderDetails.wasteType]
+    }
+    if (orderDetails.placementType) {
+      total += pricingInfo.placementFees[orderDetails.placementType]
+    }
+    if (orderDetails.quantity) {
+      total *= orderDetails.quantity
+    }
+    return Number.parseFloat(total.toFixed(2))
   }
+
+  const [totalCost, setTotalCost] = useState(calculateTotalCost())
 
   useEffect(() => {
     setTotalCost(calculateTotalCost())
@@ -128,7 +88,8 @@ const OrderWizard: React.FC = () => {
     { component: BinSizeStep, label: "Bin Size" },
     { component: BinPlacementStep, label: "Bin Placement" },
     { component: ContactInfoStep, label: "Contact Info" },
-    { component: PaymentStep, label: "Payment" },
+    { component: ScheduleStep, label: "Schedule" },
+    { component: ReviewStep, label: "Review" },
   ]
 
   const CurrentStepComponent = steps[currentStep - 1].component
@@ -143,17 +104,14 @@ const OrderWizard: React.FC = () => {
         prevStep,
         goToStep,
         calculateTotalCost: () => totalCost,
+        pricingInfo,
       }}
     >
       <Card className="max-w-4xl mx-auto bg-white dark:bg-gray-800 shadow-xl rounded-xl overflow-hidden">
         <CardContent className="p-6">
           <div className="mb-8">
-            <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">
-              New Waste Disposal Order
-            </h2>
-            <p className="text-gray-600 dark:text-gray-300">
-              Complete the following steps to place your order.
-            </p>
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">New Waste Disposal Order</h2>
+            <p className="text-gray-600 dark:text-gray-300">Complete the following steps to place your order.</p>
           </div>
           <div className="mb-8">
             <Progress value={(currentStep / steps.length) * 100} className="h-2" />
@@ -163,8 +121,8 @@ const OrderWizard: React.FC = () => {
                   key={index}
                   className={`text-sm font-medium ${
                     index + 1 <= currentStep
-                      ? 'text-orange-600 dark:text-orange-400'
-                      : 'text-gray-400 dark:text-gray-500'
+                      ? "text-orange-600 dark:text-orange-400"
+                      : "text-gray-400 dark:text-gray-500"
                   }`}
                 >
                   {step.label}
@@ -173,9 +131,7 @@ const OrderWizard: React.FC = () => {
             </div>
           </div>
           <div className="flex justify-between items-center mb-8">
-            <h3 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
-              {steps[currentStep - 1].label}
-            </h3>
+            <h3 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">{steps[currentStep - 1].label}</h3>
             <CurrentCost />
           </div>
           <AnimatePresence mode="wait">
@@ -190,12 +146,7 @@ const OrderWizard: React.FC = () => {
             </motion.div>
           </AnimatePresence>
           <div className="flex justify-between mt-8">
-            <Button
-              onClick={prevStep}
-              disabled={currentStep === 1}
-              variant="outline"
-              className="px-6"
-            >
+            <Button onClick={prevStep} disabled={currentStep === 1} variant="outline" className="px-6">
               Previous
             </Button>
             <Button
@@ -203,7 +154,7 @@ const OrderWizard: React.FC = () => {
               disabled={currentStep === steps.length}
               className="px-6 bg-orange-500 hover:bg-orange-600 text-white"
             >
-              {currentStep === steps.length ? 'Submit Order' : 'Next'}
+              {currentStep === steps.length ? "Submit Order" : "Next"}
             </Button>
           </div>
         </CardContent>
