@@ -14,7 +14,13 @@ const nextConfig = {
     parallelServerBuildTraces: true,
     parallelServerCompiles: true,
   },
-  output: 'export'
+  output: 'export',
+  // Add basePath for Capacitor
+  basePath: process.env.NODE_ENV === 'production' ? '' : '',
+  // Add assetPrefix for Capacitor
+  assetPrefix: process.env.NODE_ENV === 'production' ? '' : '',
+  // Enable static export for Capacitor
+  trailingSlash: true
 }
 
 mergeConfig(nextConfig, userConfig)
