@@ -4,7 +4,7 @@ import { type NextRequest } from 'next/server'
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 
-export const dynamic = 'force-dynamic' // Force dynamic route behavior
+export const revalidate = 0 // Revalidate at most every 0 seconds
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
