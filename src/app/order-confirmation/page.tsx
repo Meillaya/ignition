@@ -1,13 +1,13 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, Suspense } from "react"
 import { useSearchParams } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { CheckCircle, XCircle } from "lucide-react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 
-export default function OrderConfirmationPage() {
+function OrderConfirmationContent() {
   const [status, setStatus] = useState<"success" | "failure" | "loading">("loading")
   const searchParams = useSearchParams()
 
@@ -74,6 +74,27 @@ export default function OrderConfirmationPage() {
         </CardContent>
       </Card>
     </div>
+  )
+}
+
+export default function OrderConfirmationPage() {
+  return (
+    <Suspense fallback={
+      <div className="container mx-auto px-4 py-8">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-2xl font-bold text-center">
+              Processing Your Order...
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="flex flex-col items-center">
+            <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-orange-500"></div>
+          </CardContent>
+        </Card>
+      </div>
+    }>
+      <OrderConfirmationContent />
+    </Suspense>
   )
 }
 
