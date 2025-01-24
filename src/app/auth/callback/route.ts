@@ -1,10 +1,15 @@
 import { NextResponse } from 'next/server'
-// The client you created from the Server-Side Auth instructions
-import { createClient } from '@/utils/supabase/server'
+import { redirect } from 'next/navigation'
 
-export const revalidate = 0 // Revalidate at most every 0 seconds
+export const dynamic = 'force-static'
+export const revalidate = false
 
 export async function GET(request: Request) {
+  // For static export, we can't use server-side auth
+  // Redirect to client-side auth handling
+  const { searchParams, origin } = new URL(request.url)
+  const next = searchParams.get('next') ?? '/'
+  return NextResponse.redirect(new URL(`/auth/handle-callback?next=${next}`, origin))
   const { searchParams, origin } = new URL(request.url)
   const code = searchParams.get('code')
   // if "next" is in param, use it as the redirect URL
