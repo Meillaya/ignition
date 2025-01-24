@@ -1,3 +1,10 @@
+let userConfig = undefined
+try {
+  userConfig = await import('./v0-user-next.config')
+} catch (e) {
+  // ignore error
+}
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   eslint: {
@@ -14,13 +21,6 @@ const nextConfig = {
     parallelServerBuildTraces: true,
     parallelServerCompiles: true,
   },
-  output: 'export',
-  // Add basePath for Capacitor
-  basePath: process.env.NODE_ENV === 'production' ? '' : '',
-  // Add assetPrefix for Capacitor
-  assetPrefix: process.env.NODE_ENV === 'production' ? '' : '',
-  // Enable static export for Capacitor
-  trailingSlash: true
 }
 
 mergeConfig(nextConfig, userConfig)
