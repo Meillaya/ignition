@@ -3,8 +3,8 @@
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
-import { Sidebar } from '@/components/sidebar'
-import { Header } from '@/components/header'
+import { Sidebar } from '@/app/_components/sidebar'
+import { Header } from '@/app/_components/header'
 
 export default function DashboardLayout({
   children,

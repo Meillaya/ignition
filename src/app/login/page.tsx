@@ -7,11 +7,11 @@ import { signIn } from 'next-auth/react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { useToast } from '@/components/ui/use-toast'
-import { AuthLayout } from '@/components/auth/AuthLayout'
-import { OAuthButtons } from '@/components/auth/OAuthButtons'
+import { Button } from '@/app/_components/ui/button'
+import { Input } from '@/app/_components/ui/input'
+import { useToast } from '@/app/_components/ui/use-toast'
+import { AuthLayout } from '@/app/_components/auth/AuthLayout'
+import { OAuthButtons } from '@/app/_components/auth/OAuthButtons'
 import {
   Form,
   FormControl,
@@ -19,7 +19,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form'
+} from '@/app/_components/ui/form'
 import { motion, AnimatePresence } from 'framer-motion'
 
 const formSchema = z.object({

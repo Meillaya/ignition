@@ -3,11 +3,11 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import { useWizard } from "../OrderWizard"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Button } from "@/components/ui/button"
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import { Card, CardContent } from "@/components/ui/card"
+import { Input } from "@/app/_components/ui/input"
+import { Textarea } from "@/app/_components/ui/textarea"
+import { Button } from "@/app/_components/ui/button"
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/app/_components/ui/form"
+import { Card, CardContent } from "@/app/_components/ui/card"
 
 const contactInfoSchema = z.object({
   firstName: z.string().min(1, "First name is required"),

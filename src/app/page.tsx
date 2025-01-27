@@ -1,11 +1,11 @@
 import Link from 'next/link'
 import Image from 'next/image'
-import { Button } from '@/components/ui/button'
+import { Button } from '@/app/_components/ui/button'
 import { ArrowRight } from 'lucide-react'
-import FeaturesSection from '@/components/landing/FeaturesSection'
-import HowItWorksSection from '@/components/landing/HowItWorksSection'
-import AboutSection from '@/components/landing/AboutSection'
-import { ModeToggle } from '@/components/ui/mode-toggle'
+import FeaturesSection from '@/app/_components/landing/FeaturesSection'
+import HowItWorksSection from '@/app/_components/landing/HowItWorksSection'
+import AboutSection from '@/app/_components/landing/AboutSection'
+import { ModeToggle } from '@/app/_components/ui/mode-toggle'
 
 export default function LandingPage() {
   return (

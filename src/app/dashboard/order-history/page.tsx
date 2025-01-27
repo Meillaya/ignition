@@ -4,13 +4,13 @@ import { useState } from 'react'
 import { format } from 'date-fns'
 import { CalendarIcon, Truck, Package } from 'lucide-react'
 import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import { Calendar } from "@/components/ui/calendar"
+import { Button } from "@/app/_components/ui/button"
+import { Calendar } from "@/app/_components/ui/calendar"
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover"
+} from "@/app/_components/ui/popover"
 import {
   Table,
   TableBody,
@@ -18,14 +18,14 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
+} from "@/app/_components/ui/table"
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
+} from "@/app/_components/ui/select"
 
 // Mock data for orders
 const orders = [

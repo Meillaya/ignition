@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button"
+import { Button } from "@/app/_components/ui/button"
 import Image from "next/image"
 import { useState } from "react"
 import { createClient } from '@/utils/supabase/client'

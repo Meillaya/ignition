@@ -1,13 +1,13 @@
 import type React from "react"
 import Image from "next/image"
 import { motion } from "framer-motion"
-import { Card, CardContent } from "@/components/ui/card"
+import { Card, CardContent } from "@/app/_components/ui/card"
 import { useWizard } from "../OrderWizard"
 import type { WasteType } from "@/types/wizard"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
-import { Button } from "@/components/ui/button"
+import { Button } from "@/app/_components/ui/button"
 
 const wasteTypeSchema = z.object({
   wasteType: z.enum([

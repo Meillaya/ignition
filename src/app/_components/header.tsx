@@ -1,5 +1,5 @@
-import { Button } from '@/components/ui/button'
-import { ModeToggle } from '@/components/mode-toggle'
+import { Button } from '@/app/_components/ui/button'
+import { ModeToggle } from '@/app/_components/mode-toggle'
 import { Bell } from 'lucide-react'
 
 export function Header() {

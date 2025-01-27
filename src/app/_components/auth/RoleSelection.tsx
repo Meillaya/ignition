@@ -1,5 +1,5 @@
-import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
+import { Button } from "@/app/_components/ui/button"
+import { Card } from "@/app/_components/ui/card"
 import { cn } from "@/lib/utils"
 import { motion } from "framer-motion"
 import { Building2, Truck } from "lucide-react"

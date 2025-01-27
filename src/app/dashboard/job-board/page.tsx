@@ -4,14 +4,14 @@ import { useState } from 'react'
 import { format } from 'date-fns'
 import { MapPin, CalendarIcon } from 'lucide-react'
 import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import { Calendar } from "@/components/ui/calendar"
+import { Button } from "@/app/_components/ui/button"
+import { Calendar } from "@/app/_components/ui/calendar"
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover"
-import { Input } from "@/components/ui/input"
+} from "@/app/_components/ui/popover"
+import { Input } from "@/app/_components/ui/input"
 import {
   Card,
   CardContent,
@@ -19,8 +19,8 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
+} from "@/app/_components/ui/card"
+import { Badge } from "@/app/_components/ui/badge"
 
 // Mock data for jobs
 const jobs = [

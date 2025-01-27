@@ -1,4 +1,4 @@
-import OrderWizard from '@/components/OrderWizard/OrderWizard'
+import OrderWizard from '@/app/_components/OrderWizard/OrderWizard'
 
 export default function NewOrderPage() {
   return (

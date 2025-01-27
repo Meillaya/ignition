@@ -1,13 +1,13 @@
 import type React from "react"
 import { motion } from "framer-motion"
-import { Card, CardContent } from "@/components/ui/card"
+import { Card, CardContent } from "@/app/_components/ui/card"
 import { useWizard } from "../OrderWizard"
 import type { BinPlacement } from "@/types/wizard"
 import { MapPin, AlertTriangle } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
-import { Button } from "@/components/ui/button"
+import { Button } from "@/app/_components/ui/button"
 
 const binPlacementSchema = z.object({
   placementType: z.enum(["right_side", "left_side", "on_lawn"]),

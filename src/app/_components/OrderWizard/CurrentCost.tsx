@@ -1,5 +1,5 @@
 import { useWizard } from './OrderWizard'
-import { Card, CardContent } from '@/components/ui/card'
+import { Card, CardContent } from '@/app/_components/ui/card'
 
 export function CurrentCost() {
   const { calculateTotalCost } = useWizard()

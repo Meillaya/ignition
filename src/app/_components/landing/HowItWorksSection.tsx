@@ -1,4 +1,4 @@
-import { Button } from '@/components/ui/button'
+import { Button } from '@/app/_components/ui/button'
 import { ArrowRight, Clipboard, Truck, Recycle, BarChartIcon as ChartBar } from 'lucide-react'
 import Link from 'next/link'
 
