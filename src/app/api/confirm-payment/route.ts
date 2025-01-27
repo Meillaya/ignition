@@ -15,7 +15,7 @@ export async function POST(req: Request) {
       if (paymentIntent.status === "succeeded") {
         // Here you would typically update your database to mark the order as paid
         // For example: await db.order.update({ where: { id: orderId }, data: { status: 'paid' } })
-
+          
         return NextResponse.json({ success: true })
       } else {
         return NextResponse.json({ success: false, error: "Payment not successful" }, { status: 400 })
