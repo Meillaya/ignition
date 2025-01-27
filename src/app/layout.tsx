@@ -1,6 +1,7 @@
 import type  { Metadata } from 'next'
 import { Geist } from 'next/font/google'
 import ClientLayout from './client-layout'
+import './globals.css'
 
 const geist = Geist({
   subsets: ['latin'],
@@ -11,7 +12,7 @@ export const metadata: Metadata = {
   title: 'Fox In The Truck - Construction Waste Management',
   description: 'Efficient and sustainable construction waste management solutions',
   icons: {
-    icon: '/foxinthetruck(192png).png',
+    icon: '/favicon.png',
   },
 }
 
@@ -38,4 +39,4 @@ export default function RootLayout({
 
 
 
-import './globals.css'
+
