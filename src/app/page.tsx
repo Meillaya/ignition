@@ -17,7 +17,7 @@ export default function LandingPage() {
             {/* Logo */}
             <Link href="/" className="flex items-center gap-2">
               <Image
-                src="foxinthetruck.jpg"
+                src="/foxinthetruck.jpg"
                 alt="Fox In The Truck"
                 width={40}
                 height={40}

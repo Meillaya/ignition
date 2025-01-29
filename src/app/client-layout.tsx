@@ -1,8 +1,8 @@
 "use client"
 
-import { ThemeProvider } from "../components/theme-provider"
+import { ThemeProvider } from "./_components/theme-provider"
 
-import { Toaster } from "../components/ui/toaster"
+
 import { SessionProvider } from 'next-auth/react'
 
 export default function ClientLayout({
@@ -20,7 +20,7 @@ export default function ClientLayout({
       <SessionProvider>
 
           {children}
-          <Toaster />
+
 
       </SessionProvider>
     </ThemeProvider>
