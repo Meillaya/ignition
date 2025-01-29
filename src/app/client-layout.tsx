@@ -18,10 +18,9 @@ export default function ClientLayout({
       disableTransitionOnChange
     >
       <SessionProvider>
-
+        <trpc.Provider client={TRPCProvider} queryClient={new QueryClient()}>
           {children}
-
-
+        </trpc.Provider>
       </SessionProvider>
     </ThemeProvider>
   )
