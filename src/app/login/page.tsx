@@ -1,17 +1,13 @@
-"use client"
-
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { signIn } from 'next-auth/react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { Button } from '@/app/_components/ui/button'
 import { Input } from '@/app/_components/ui/input'
-import { useToast } from '@/app/_components/ui/use-toast'
 import { AuthLayout } from '@/app/_components/auth/AuthLayout'
-import { OAuthButtons } from '@/app/_components/auth/OAuthButtons'
+
 import {
   Form,
   FormControl,
@@ -21,53 +17,46 @@ import {
   FormMessage,
 } from '@/app/_components/ui/form'
 import { motion, AnimatePresence } from 'framer-motion'
+import { auth } from "@/server/auth"
+import { api, HydrateClient } from "@/trpc/server";
 
 const formSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
   password: z.string().min(8, { message: "Password must be at least 8 characters" }),
 })
 
-export default function LoginPage() {
+export default async function LoginPage() {
   const router = useRouter()
-  const { toast } = useToast()
+  const session = await auth();
   const [isLoading, setIsLoading] = useState(false)
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       email: "",
-      password: "",
+      // password: "",
     },
   })
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
-    setIsLoading(true)
-    try {
-      const result = await signIn('credentials', {
-        redirect: false,
-        email: values.email,
-        password: values.password,
-      })
+  // async function onSubmit(values: z.infer<typeof formSchema>) {
+  //   setIsLoading(true)
+  //   try {
+  //     const result = await signIn('credentials', {
+  //       redirect: false,
+  //       email: values.email,
+  //       // password: values.password,
+  //     })
 
-      if (result?.error) {
-        throw new Error(result.error)
-      }
+  //     if (result?.error) {
+  //       throw new Error(result.error)
+  //     }
 
-      router.push('/dashboard')
-      toast({
-        title: "Welcome back!",
-        description: "Successfully logged in to your account.",
-      })
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Login failed",
-        description: error instanceof Error ? error.message : "An unexpected error occurred",
-      })
-    } finally {
-      setIsLoading(false)
-    }
-  }
+  //     router.push('/dashboard')
+  //   } catch (error) {
+  //   } finally {
+  //     setIsLoading(false)
+  //   }
+  // }
 
   return (
     <AuthLayout
@@ -151,7 +140,7 @@ export default function LoginPage() {
               </div>
             </div>
 
-            <OAuthButtons isLoading={isLoading} />
+            {/* <OAuthButtons isLoading={isLoading} /> */}
 
             <div className="text-center space-y-2">
               <Link

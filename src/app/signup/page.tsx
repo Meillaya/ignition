@@ -10,7 +10,7 @@ import { Button } from '@/app/_components/ui/button'
 import { Input } from '@/app/_components/ui/input'
 import { useToast } from '@/app/_components/ui/use-toast'
 import { AuthLayout } from '@/app/_components/auth/AuthLayout'
-import { OAuthButtons } from '@/app/_components/auth/OAuthButtons'
+// import { OAuthButtons } from '@/app/_components/auth/OAuthButtons'
 import { RoleSelection } from '@/app/_components/auth/RoleSelection'
 import { PasswordStrengthIndicator } from '@/app/_components/auth/PasswordStrengthIndicator'
 import {
