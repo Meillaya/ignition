@@ -9,10 +9,8 @@ import * as z from 'zod'
 import { Button } from '@/app/_components/ui/button'
 import { Input } from '@/app/_components/ui/input'
 import { useToast } from '@/app/_components/ui/use-toast'
-import { AuthLayout } from '@/app/_components/auth/AuthLayout'
-// import { OAuthButtons } from '@/app/_components/auth/OAuthButtons'
-import { RoleSelection } from '@/app/_components/auth/RoleSelection'
-import { PasswordStrengthIndicator } from '@/app/_components/auth/PasswordStrengthIndicator'
+import { AuthLayout } from '@/app/_components/AuthLayout'
+import { RoleSelection } from '@/app/_components/RoleSelection'
 import {
   Form,
   FormControl,
@@ -26,11 +24,6 @@ import { motion, AnimatePresence } from 'framer-motion'
 
 const formSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
-  password: z.string()
-    .min(8, { message: "Password must be at least 8 characters" })
-    .regex(/[A-Z]/, { message: "Must contain at least one uppercase letter" })
-    .regex(/[0-9]/, { message: "Must contain at least one number" })
-    .regex(/[^A-Za-z0-9]/, { message: "Must contain at least one special character" }),
   terms: z.boolean().refine(val => val === true, {
     message: "You must accept the terms and conditions"
   })
@@ -47,7 +40,6 @@ export default function SignupPage() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       email: "",
-      password: "",
       terms: false
     },
   })
@@ -68,7 +60,6 @@ export default function SignupPage() {
         },
         body: JSON.stringify({
           email: form.getValues('email'),
-          password: form.getValues('password'),
           role: selectedRole,
         }),
       })
@@ -131,26 +122,7 @@ export default function SignupPage() {
                       </FormItem>
                     )}
                   />
-                  <FormField
-                    control={form.control}
-                    name="password"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Password</FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="Create a strong password"
-                            type="password"
-                            autoComplete="new-password"
-                            disabled={isLoading}
-                            {...field}
-                          />
-                        </FormControl>
-                        <PasswordStrengthIndicator password={field.value} />
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                  {/* Password field removed - using OAuth/magic links */}
 
                   <FormField
                     control={form.control}
@@ -207,7 +179,7 @@ export default function SignupPage() {
                 </div>
               </div>
 
-              <OAuthButtons isLoading={isLoading} />
+              {/* <OAuthButtons isLoading={isLoading} /> */}
 
               <div className="text-center text-sm text-gray-600 dark:text-gray-300">
                 Already have an account?{' '}

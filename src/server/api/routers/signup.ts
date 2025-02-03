@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabaseClient';
-import { hash } from 'bcryptjs';
+\
 import { z } from 'zod';
 
 const signupSchema = z.object({
@@ -37,8 +37,6 @@ export async function POST(request: Request) {
       );
     }
 
-    // Hash password
-    const hashedPassword = await hash(password, 12);
 
     // First create user in Supabase Auth
     const { data: authData, error: authError } = await supabase.auth.signUp({

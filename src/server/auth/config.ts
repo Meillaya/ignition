@@ -1,7 +1,9 @@
 import { DrizzleAdapter } from "@auth/drizzle-adapter";
 import { type DefaultSession, type NextAuthConfig } from "next-auth";
-import DiscordProvider from "next-auth/providers/discord";
-import GithubProvider from "next-auth/providers/github"
+import GoogleProvider from "next-auth/providers/google";
+import AppleProvider from "next-auth/providers/apple";
+import Resend from "next-auth/providers/resend"
+import Credentials from "next-auth/providers/credentials"
 import { db } from "@/server/db";
 import {
   accounts,
@@ -21,7 +23,7 @@ declare module "next-auth" {
     user: {
       id: string;
       // ...other properties
-      // role: UserRole;
+      //role: UserRole;
     } & DefaultSession["user"];
   }
 
@@ -38,10 +40,19 @@ declare module "next-auth" {
  */
 export const authConfig = {
   providers: [
-    DiscordProvider,
-    GithubProvider({
-      clientId: process.env.AUTH_GITHUB_ID,
-      clientSecret: process.env.AUTH_GITHUB_SECRET
+    GoogleProvider({
+      clientId: process.env.AUTH_GOOGLE_ID,
+      clientSecret: process.env.AUTH_GOOGLE_SECRET,
+      allowDangerousEmailAccountLinking: true
+    }),
+    AppleProvider({
+      clientId: process.env.AUTH_APPLE_ID,
+      clientSecret: process.env.AUTH_APPLE_SECRET,
+      allowDangerousEmailAccountLinking: true
+    }),
+    Resend({
+      apiKey: process.env.AUTH_RESEND_KEY,
+      from: "no-reply@company.com"
     }),
     /**
      * ...add more providers here.
@@ -69,3 +80,6 @@ export const authConfig = {
     }),
   },
 } satisfies NextAuthConfig;
+
+
+

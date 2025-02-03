@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { Button } from '@/app/_components/ui/button'
 import { Input } from '@/app/_components/ui/input'
-import { AuthLayout } from '@/app/_components/auth/AuthLayout'
+import { AuthLayout } from '@/app/_components/AuthLayout'
 
 import {
   Form,
@@ -22,7 +22,6 @@ import { api, HydrateClient } from "@/trpc/server";
 
 const formSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
-  password: z.string().min(8, { message: "Password must be at least 8 characters" }),
 })
 
 export default async function LoginPage() {
@@ -34,29 +33,12 @@ export default async function LoginPage() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       email: "",
-      // password: "",
     },
   })
 
-  // async function onSubmit(values: z.infer<typeof formSchema>) {
-  //   setIsLoading(true)
-  //   try {
-  //     const result = await signIn('credentials', {
-  //       redirect: false,
-  //       email: values.email,
-  //       // password: values.password,
-  //     })
+  async function onSubmit(values: z.infer<typeof formSchema>) {
 
-  //     if (result?.error) {
-  //       throw new Error(result.error)
-  //     }
-
-  //     router.push('/dashboard')
-  //   } catch (error) {
-  //   } finally {
-  //     setIsLoading(false)
-  //   }
-  // }
+  }
 
   return (
     <AuthLayout
@@ -84,25 +66,6 @@ export default async function LoginPage() {
                           placeholder="name@example.com"
                           type="email"
                           autoComplete="email"
-                          disabled={isLoading}
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="password"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Password</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="Enter your password"
-                          type="password"
-                          autoComplete="current-password"
                           disabled={isLoading}
                           {...field}
                         />
