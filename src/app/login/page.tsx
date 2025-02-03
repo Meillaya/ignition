@@ -18,7 +18,7 @@ import {
 } from '@/app/_components/ui/form'
 import { motion, AnimatePresence } from 'framer-motion'
 import { auth } from "@/server/auth"
-import { api, HydrateClient } from "@/trpc/server";
+
 
 const formSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
