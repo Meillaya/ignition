@@ -2,8 +2,6 @@ import { DrizzleAdapter } from "@auth/drizzle-adapter";
 import { type DefaultSession, type NextAuthConfig } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import AppleProvider from "next-auth/providers/apple";
-import Resend from "next-auth/providers/resend"
-
 import { db } from "@/server/db";
 import {
   accounts,
@@ -50,10 +48,7 @@ export const authConfig = {
       clientSecret: process.env.AUTH_APPLE_SECRET,
       allowDangerousEmailAccountLinking: true
     }),
-    Resend({
-      apiKey: process.env.AUTH_RESEND_KEY,
-      from: "no-reply@company.com"
-    }),
+
     /**
      * ...add more providers here.
      *
