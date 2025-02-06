@@ -3,7 +3,7 @@ import { Button } from '@/app/_components/ui/button'
 import { ArrowRight, Package, FileText, Truck, DollarSign } from 'lucide-react'
 import Link from 'next/link'
 import  Metadata  from 'next'
-
+import { api, HydrateClient } from "@/trpc/server";
 export default function DashboardPage() {
   return (
     <div className="container mx-auto p-6 space-y-8">

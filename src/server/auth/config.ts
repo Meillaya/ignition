@@ -3,7 +3,7 @@ import { type DefaultSession, type NextAuthConfig } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import AppleProvider from "next-auth/providers/apple";
 import Resend from "next-auth/providers/resend"
-import Credentials from "next-auth/providers/credentials"
+
 import { db } from "@/server/db";
 import {
   accounts,
