@@ -1,22 +1,58 @@
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import Link from 'next/link'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useForm } from 'react-hook-form'
-import * as z from 'zod'
-import { Button } from '@/app/_components/ui/button'
-import { Input } from '@/app/_components/ui/input'
-import { AuthLayout } from '@/app/_components/AuthLayout'
+import Link from "next/link";
+import { Button } from "@/app/_components/ui/button";
+import { AuthLayout } from "@/app/_components/AuthLayout";
+import { signIn } from "next-auth/react";
+import Image from "next/image";
+import { auth } from "@/server/auth";
+import { redirect } from "next/navigation";
 
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/app/_components/ui/form'
-import { motion, AnimatePresence } from 'framer-motion'
-import { auth } from "@/server/auth"
+export default async function LoginPage() {
+  const session = await auth();
 
+  if (session?.user) {
+    redirect("/dashboard");
+  }
 
+  return (
+    <AuthLayout
+      title="Welcome Back"
+      description="Sign in to your account to continue"
+    >
+      <div className="social-buttons-container">
+        <Button
+          variant="outline"
+          className="social-login-btn google-btn"
+          onClick={() => signIn("google", { redirect: false })}
+        >
+          <Image
+            src="/google.svg"
+            alt="Google"
+            width={24}
+            height={24}
+          />
+        </Button>
+        <Button
+          variant="outline"
+          className="social-login-btn apple-btn"
+          onClick={() => signIn("apple", { redirect: false })}
+        >
+          <Image
+            src="/apple.svg"
+            alt="Apple"
+            width={24}
+            height={24}
+          />
+        </Button>
+      </div>
+      <p className="text-sm text-muted-foreground text-center">
+        Don't have an account?{" "}
+        <Link
+          href="/signup"
+          className="text-primary underline hover:no-underline"
+        >
+          Sign up
+        </Link>
+      </p>
+    </AuthLayout>
+  );
+}
